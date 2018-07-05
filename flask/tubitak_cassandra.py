@@ -11,7 +11,7 @@ app = FlaskAPI(__name__)
 notes = {
     0: 'do the shopping',
     1: 'build the codez',
-    2: 'paint tshe door',
+    2: 'paint tsshe door',
 }
 
 @app.route('/cassandraExample/')
