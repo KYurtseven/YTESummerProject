@@ -25,6 +25,8 @@ export function getRoot(){
     }
 }
 
+export const exampleURL = "api/cassandraExample/";
+
 export const MOCK_USER_OBJ = 
 [
     {
