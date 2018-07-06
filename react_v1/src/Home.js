@@ -12,8 +12,7 @@ class Home extends Component
         this.state = 
         {
             isLoading: true,
-            user: [],
-            response : {}
+            userData : {}
         }
     }
 
@@ -21,23 +20,13 @@ class Home extends Component
     {
         if(Constants.IS_MOCK)
         {
-            var tmpuser = [];
-            for(let i = 0; i < Constants.MOCK_USER_OBJ.length; i++)
-                tmpuser[i] = Constants.MOCK_USER_OBJ[i];
-
-            this.setState(
-                {user : tmpuser}, 
-                () => {console.log(this.state.user)}
-            );
-
             var url;
-            url = Constants.getRoot() + BasePage.exampleURL;
+            url = Constants.getRoot() + Constants.exampleURL;
 
             let res = await BasePage.CallApiGet(url);
             let restext = await res.text();
-            //console.log("resCassandra: " + restext);
 
-            this.setState({isLoading: false, response: JSON.parse(restext)});
+            this.setState({isLoading: false, userData: JSON.parse(restext)});
             
         }
         else
@@ -58,24 +47,14 @@ class Home extends Component
         }
         else
         {
-            // TO DO
-            var renderUser = [];
-            for(let i = 0; i < this.state.user.length; i++)
-            {
-                renderUser.push(
-                    <UserItem 
-                        key={i}
-                        userInfo = {this.state.user[i]} />
-                )
-            }
-            
             var renderCassandra = []
-            for(let i = 0; i < this.state.response.length; i++)
+            for(let i = 0; i < this.state.userData.length; i++)
             {
+                console.log(this.state.userData[i].username)
                 renderCassandra.push(
-                    <CassandraItem
+                    <UserItem
                         key = {i}
-                        data = {this.state.response[i]}/>
+                        userInfo = {this.state.userData[i]}/>
                 );
             }
 
@@ -85,8 +64,6 @@ class Home extends Component
                         <img src={tubitak_logo} style = {styles.tubitak_logo} alt =''/>
                         <h1 className = "App-title" style = {styles.tubitak_header_text}> TÜBİTAK </h1>
                     </header>
-                    <h1> Here is the mock data</h1>
-                    {renderUser}
                     {renderCassandra}
                 </div>
             );
@@ -113,11 +90,11 @@ const styles =
     },
     userDiv:
     {
-        border: 'double', 
-        textAlign: 'right'
+        textAlign: 'center'
     },
     userNameId:
     {
+        marginTop: 50,
         float: 'left',
         marginLeft: 20,
         fontSize: 16
@@ -126,37 +103,48 @@ const styles =
 
 const UserItem = (props) => 
 {
-    var entryDates = [];
+    var lateDates = [];
+    
+    if(props.userInfo.dates == null || props.userInfo.dates == undefined)
+        return(
+            <div className = "User-div-left">
+                <p>username: {props.userInfo.username}</p>
+                <p>email: {props.userInfo.email}</p>
+                <p>name: {props.userInfo.name}</p>
+                <p>deposit: {props.userInfo.deposit}</p>
+                <p>userType: {props.userInfo.usertype}</p>
+            </div>
+        );
 
-    for(var i = 0; i < props.userInfo.entry_dates.length; i++)
+    for(var i = 0; i < props.userInfo.dates.length; i++)
     {
-        entryDates.push(
-            <EntryDates 
+        lateDates.push(
+            <LateDates 
                 key = {i}
-                date = {props.userInfo.entry_dates[i]}/>
+                date = {props.userInfo.dates[i]}/>
         );
     }
-
     return(
-        <div style={styles.userDiv}>
-            <p style={styles.userNameId}>{props.userInfo.name}</p>
-            <p style={styles.userNameId}>{props.userInfo.id}</p>
-            <p style={{marginRight: 20}}>{entryDates}</p>
+        <div>
+            <div className = "User-div-left" >
+                <p>username: {props.userInfo.username}</p>
+                <p>email: {props.userInfo.email}</p>
+                <p>name: {props.userInfo.name}</p>
+                <p>deposit: {props.userInfo.deposit}</p>
+                <p>userType: {props.userInfo.usertype}</p>
+            </div>
+            <div className = "User-div-right">
+                {lateDates}
+            </div>
         </div>
     );
 }
 
-const EntryDates = (props) =>
+const LateDates = (props) =>
 {
     return(
         <li>{props.date}</li>
     );
 }
 
-const CassandraItem = (props) =>
-{
-    return(
-        <p>{props.data.uuid} {props.data.firstname} {props.data.lastname} </p>
-    );
-}
 export default Home;
