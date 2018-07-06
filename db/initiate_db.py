@@ -44,4 +44,5 @@ with open('mockdata.csv', 'r') as csvfile:
 		insert = "INSERT INTO YTE.LAZY_EMPLOYEES(username, name, dates, deposit, email, usertype) " +\
 			"VALUES ('" + username + "','" + name + "'," + date + \
 			"," + deposit + ",'" + email + "', '" + type + "')IF NOT EXISTS;"
+		
 		session.execute(insert)
