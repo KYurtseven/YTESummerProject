@@ -16,6 +16,7 @@ class Home extends Component
             response : {}
         }
     }
+
     async componentDidMount()
     {
         if(Constants.IS_MOCK)
@@ -30,7 +31,7 @@ class Home extends Component
             );
 
             var url;
-            url = Constants.getRoot() + 'cassandraExample/';
+            url = Constants.getRoot() + BasePage.exampleURL;
 
             let res = await BasePage.CallApiGet(url);
             let restext = await res.text();
@@ -44,35 +45,6 @@ class Home extends Component
             // TO DO
         }
     }
-
-    /*
-    renderUser()
-    {
-        var data = this.state.user;
-        // this renders per user
-        const userNames = data.map(function(d)
-        {
-            // this renders users date of entry's
-            const dates = d.entry_dates.map(function(d2, j)
-            {
-                return(<li key={d2}>{d2}</li>);
-            });
-            return(
-            <div key={d.id} style={{border: 'double', textAlign: 'right'}} >
-                
-                <p style={{float: 'left',marginLeft: 20,fontSize: 16,}}>
-                    {d.name}
-                </p>
-               
-                <p style={{marginRight: 20}}>
-                    {dates}
-                </p>
-            </div>
-            );
-        });
-        return(<div>{userNames}</div>);
-    }
-    */
 
     render()
     {
