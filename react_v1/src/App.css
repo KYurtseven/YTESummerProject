@@ -28,11 +28,24 @@
 }
 
 .User-div-left {
-  text-align: 'left';
-  grid-column-start: 3;
-  flex: 1
+  text-align: left;
+  display: table-cell;
+  /*background-color: green; */
 }
 .User-div-right {
-  text-align: 'right';
-  flex: 1
+  text-align: right;
+  display: table-cell;
+}
+.User-div-container{
+  display: table;
+  border-style: ridge;
+  width: 99.5%;
+
+  table-layout: fixed;
+}
+.User-text-left{
+  padding-left: 20px; 
+}
+.User-text-right{
+  padding-right: 20px;
 }
