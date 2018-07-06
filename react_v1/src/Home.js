@@ -65,6 +65,7 @@ class Home extends Component
                         <h1 className = "App-title" style = {styles.tubitak_header_text}> TÜBİTAK </h1>
                     </header>
                     {renderCassandra}
+                    <EssayForm/>
                 </div>
             );
         }
@@ -87,17 +88,6 @@ const styles =
     {
         backgroundColor : 'red',
         height: 100
-    },
-    userDiv:
-    {
-        textAlign: 'center'
-    },
-    userNameId:
-    {
-        marginTop: 50,
-        float: 'left',
-        marginLeft: 20,
-        fontSize: 16
     }
 }
 
@@ -107,12 +97,18 @@ const UserItem = (props) =>
     
     if(props.userInfo.dates == null || props.userInfo.dates == undefined)
         return(
-            <div className = "User-div-left">
-                <p>username: {props.userInfo.username}</p>
-                <p>email: {props.userInfo.email}</p>
-                <p>name: {props.userInfo.name}</p>
-                <p>deposit: {props.userInfo.deposit}</p>
-                <p>userType: {props.userInfo.usertype}</p>
+            <div className = "User-div-container">
+                <div className = "User-div-left">
+                    <p className= "User-text-left">username: {props.userInfo.username}</p>
+                    <p className= "User-text-left">email: {props.userInfo.email}</p>
+                    <p className= "User-text-left">name: {props.userInfo.name}</p>
+                    <p className= "User-text-left">deposit: {props.userInfo.deposit}</p>
+                    <p className= "User-text-left">userType: {props.userInfo.usertype}</p>
+                </div>
+                <div className="User-div-right">
+                    <p className= "User-text-right">No Late Data</p>
+                    <input type="submit" value="Submit" />
+                </div>
             </div>
         );
 
@@ -125,16 +121,23 @@ const UserItem = (props) =>
         );
     }
     return(
-        <div>
+        <div className= "User-div-container">
             <div className = "User-div-left" >
-                <p>username: {props.userInfo.username}</p>
-                <p>email: {props.userInfo.email}</p>
-                <p>name: {props.userInfo.name}</p>
-                <p>deposit: {props.userInfo.deposit}</p>
-                <p>userType: {props.userInfo.usertype}</p>
+                <p className= "User-text-left">username: {props.userInfo.username}</p>
+                <p className= "User-text-left">email: {props.userInfo.email}</p>
+                <p className= "User-text-left">name: {props.userInfo.name}</p>
+                <p className= "User-text-left">deposit: {props.userInfo.deposit}</p>
+                <p className= "User-text-left">userType: {props.userInfo.usertype}</p>
             </div>
             <div className = "User-div-right">
                 {lateDates}
+                <form>
+                    <label>
+                        Name:
+                    <input type="text" name="name" />
+                    </label>
+                    <input type="submit" value="Submit" />
+                </form>
             </div>
         </div>
     );
@@ -143,8 +146,41 @@ const UserItem = (props) =>
 const LateDates = (props) =>
 {
     return(
-        <li>{props.date}</li>
+        <li className= "User-text-right">{props.date}</li>
     );
 }
+
+class EssayForm extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        value: 'Please write an essay about your favorite DOM element.'
+      };
+  
+      this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
+    }
+  
+    handleChange(event) {
+      this.setState({value: event.target.value});
+    }
+  
+    handleSubmit(event) {
+      alert('An essay was submitted: ' + this.state.value);
+      event.preventDefault();
+    }
+  
+    render() {
+      return (
+        <form onSubmit={this.handleSubmit}>
+          <label>
+            Essay:
+            <textarea value={this.state.value} onChange={this.handleChange} />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
+      );
+    }
+  }
 
 export default Home;
