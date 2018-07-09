@@ -8,7 +8,7 @@ session = cluster.connect('yte')
 app = FlaskAPI(__name__)
 
 
-@app.route('/api/cassandraExample/')
+@app.route('/api/cassandraExample/', methods = ['GET'])
 def cassandraExample():
 	queryResult = session.execute("Select json * from YTE.lazy_employees")
 	ret = []
@@ -26,6 +26,31 @@ def cassandraExample():
 		})
 	return ret
 
+@app.route('/api/user/addDate/', methods = ['POST'])
+def addDate():
+	username = request.get_json(force=True).get('username')
+	date = request.get_json(force=True).get('date')
+
+	query = "UPDATE YTE.lazy_employees SET dates = dates + ['" + date + "'] WHERE username = '" + username + "'"
+	session.execute(query)
+	
+	# TO DO, delete ret and return
+	ret = {'username': username, 'date': date}
+	return ret
+
+@app.route('/api/user/updateDeposit/', methods = ['POST'])
+def updateDeposit():
+
+	username = request.get_json(force=True).get('username')
+	deposit = request.get_json(force=True).get('deposit')
+
+	query = "UPDATE YTE.lazy_employees SET deposit = " + deposit + " WHERE username = '" + username + "'"
+
+	print("QUERY", query)
+	session.execute(query)
+	# TO DO, delete ret and return
+	ret = {'username' : username, 'deposit' : deposit}
+	return ret
 
 if __name__ == "__main__":
     app.run(debug=True)
