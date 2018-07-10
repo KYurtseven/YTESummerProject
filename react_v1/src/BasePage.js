@@ -18,8 +18,7 @@ export async function CallApiPost(apiUrl, body) {
 	                            'Content-Type': 'application/json;charset=UTF-8',
 	                          },
 	                          body : body	                          	                         
-													}).catch(error => console.error('Error:', error))
-													.then(response => console.log('Success:', response));
+	                        });
 }
 
 export function isValidDate(dateString)

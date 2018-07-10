@@ -17,7 +17,8 @@ class Home extends Component
             // when the submit button is pressed
             isSubmit: false,
             userData : {},
-            submitValue : []
+            submitValue : [],
+            error: ''
         }
     }
 
@@ -39,16 +40,35 @@ class Home extends Component
         }
         else
         {
+            this.setState({isLoading: true});
             var url;
             url = Constants.getRoot() + Constants.exampleURL;
 
-            let res = await BasePage.CallApiGet(url);
-            let restext = await res.text();
-            let resJSON = JSON.parse(restext);
-
-            resJSON = this.sortByKey(resJSON, 'username');
-            this.setState({isLoading: false, userData: resJSON});
+            try
+            {
+                let res = await BasePage.CallApiGet(url);
+                if(res.status == 200)
+                {
+                    let restext = await res.text();
+                    let resJSON = JSON.parse(restext);
+    
+                    resJSON = this.sortByKey(resJSON, 'username');
+                    this.setState({isLoading: false, userData: resJSON});
+                }
+                else
+                    throw(Constants.getNot200);
+            }
+            catch(e)
+            {
+                this.setState({error: e});
+                console.log('Error on fetching data: ' + e);
+            }
         }
+    }
+
+    async fetchDataAgain()
+    {
+        await this.componentDidMount();
     }
 
     render()
@@ -70,10 +90,10 @@ class Home extends Component
                     <UserItem
                         key = {i}
                         userInfo = {this.state.userData[i]}
-                    />
+                        fetchDataAgain = {this.fetchDataAgain.bind(this)}
+                     />
                 );
             }
-
             return(
                 <div className="App">
                     <header className="App-header" style ={styles.headerstyle}>
