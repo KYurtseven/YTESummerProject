@@ -25,6 +25,11 @@ export function getRoot(){
     }
 }
 
+// ERRORS
+export const getNot200 = 'GET Response status is not 200';
+export const postNot200 = 'POST Response status is not 200';
+
+// API'S
 export const exampleURL = 'api/cassandraExample/';
 export const addDate = 'api/user/addDate/';
 export const updateDeposit = 'api/user/updateDeposit/';

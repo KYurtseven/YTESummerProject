@@ -20,7 +20,8 @@ class UserItem extends Component
             dateValue : '',
             depositValue: '',
             isShowDateModal: false,
-            isShowDepositModal: false
+            isShowDepositModal: false,
+            error: ''
         };
 
         this.handleDateChange = this.handleDateChange.bind(this);
@@ -46,7 +47,7 @@ class UserItem extends Component
     }
 
     // post to the database
-    handleDateSubmit(event)
+    async handleDateSubmit(event)
     {
         if(BasePage.isValidDate(this.state.dateValue))
         {
@@ -57,11 +58,22 @@ class UserItem extends Component
                 username : this.props.userInfo.username,
                 date : this.state.dateValue
             });
-            BasePage.CallApiPost(url, body);
 
-            // TO DO
-            event.preventDefault(); // how it works? What is it?
-            this.setState({isShowDateModal : false});
+            try
+            {
+                let res = await BasePage.CallApiPost(url, body);
+                if(res.status == 200)
+                {
+                    await this.props.fetchDataAgain();
+                }
+                else
+                    throw(Constants.postNot200);
+            }
+            catch(e)
+            {
+                this.setState({error: e});
+                console.log('Error on date submit: ' + this.state.error);
+            }
         }
         else
         {
@@ -123,7 +135,7 @@ class UserItem extends Component
     }
 
     // post to the database
-    handleDepositSubmit(event)
+    async handleDepositSubmit(event)
     {
         if(!isNaN(this.state.depositValue))
         {
@@ -135,9 +147,23 @@ class UserItem extends Component
                 deposit : this.state.depositValue
             });
             //BasePage.CallApiPost(url, body).done(() => {});
-            BasePage.CallApiPost(url, body);
-
-            this.setState({isShowDepositModal : false});
+            
+            try
+            {
+                let res = await BasePage.CallApiPost(url, body);
+                if(res.status == 200)
+                {
+                    await this.props.fetchDataAgain();
+                    // this page will be automatically re-rendered
+                }
+                else
+                    throw(Constants.postNot200);
+            }
+            catch(e)
+            {
+                this.setState({error: e});
+                console.log('Error on deposit submit' + this.state.error);
+            }
         }
         else
         {
