@@ -18,9 +18,8 @@ export async function CallApiPost(apiUrl, body) {
 	                            'Content-Type': 'application/json;charset=UTF-8',
 	                          },
 	                          body : body	                          	                         
-	                        }).catch((error) => {
-															return null;
-													});
+													}).catch(error => console.error('Error:', error))
+													.then(response => console.log('Success:', response));
 }
 
 export function isValidDate(dateString)
@@ -29,7 +28,7 @@ export function isValidDate(dateString)
 
 		if(!regex_date.test(dateString))
 		{
-				return false;
+				return 'error';
 		}
 
 		// Parse the date parts to integers
@@ -41,7 +40,7 @@ export function isValidDate(dateString)
 		// Check the ranges of month and year
 		if(year < 1000 || year > 3000 || month == 0 || month > 12)
 		{
-				return false;
+				return 'error';
 		}
 
 		var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
@@ -53,6 +52,7 @@ export function isValidDate(dateString)
 		}
 
 		// Check the range of the day
-		return day > 0 && day <= monthLength[month - 1];
-		
+		if(day > 0 && day <= monthLength[month - 1])
+			return 'success';
+		return 'error';
 }
