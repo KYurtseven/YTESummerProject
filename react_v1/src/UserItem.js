@@ -7,7 +7,10 @@ import {
     Modal,
     FormGroup,
     ControlLabel,
-    FormControl
+    FormControl,
+    ListGroup,
+    ListGroupItem,
+    ButtonToolbar
 } from 'react-bootstrap';
 
 
@@ -21,23 +24,51 @@ class UserItem extends Component
             depositValue: '',
             isShowDateModal: false,
             isShowDepositModal: false,
+            isShowDeleteDateModal : false,
+            dates : [],
             error: ''
         };
 
+        // Add Date
         this.handleDateChange = this.handleDateChange.bind(this);
         this.handleDateSubmit = this.handleDateSubmit.bind(this);
 
-        this.handleDepositChange = this.handleDepositChange.bind(this);
-        this.handleDepositSubmit = this.handleDepositSubmit.bind(this);
-   
         this.showDateModal = this.showDateModal.bind(this);
         this.hideDateModal = this.hideDateModal.bind(this);
 
+        // Deposit
+        this.handleDepositChange = this.handleDepositChange.bind(this);
+        this.handleDepositSubmit = this.handleDepositSubmit.bind(this);
+   
         this.showDepositModal = this.showDepositModal.bind(this);
         this.hideDepositModal = this.hideDepositModal.bind(this);
 
+        // Delete Date
+        this.handleDeleteDateSubmit = this.handleDeleteDateSubmit.bind(this);
+
+        this.showDeleteDateModal = this.showDeleteDateModal.bind(this);
+        this.hideDeleteDateModal = this.hideDeleteDateModal.bind(this);
     }
 
+    componentWillMount()
+    {
+        try
+        {
+            var myarr = []
+            for(var i = 0; i < this.props.userInfo.dates.length; i++)
+            {
+                let tmpval = {};
+                tmpval.date = this.props.userInfo.dates[i];
+                tmpval.isSelected = false;
+                myarr.push(tmpval);
+            }
+            this.setState({dates : myarr});
+        }
+        catch(error)
+        {
+            console.log('Error useritem componentwillmount: ' + error);
+        }
+    }
     // DATE FUNCTIONS
 
     // sets state of the date entry
@@ -49,7 +80,7 @@ class UserItem extends Component
     // post to the database
     async handleDateSubmit(event)
     {
-        if(BasePage.isValidDate(this.state.dateValue))
+        if(BasePage.isValidDate(this.state.dateValue) == 'success')
         {
             var url;
             url = Constants.getRoot() + Constants.addDate;
@@ -215,6 +246,114 @@ class UserItem extends Component
 
     // END OF DEPOSIT FUNCTIONS
 
+    
+    // DELETE DATE FUNCTIONS
+
+    showDeleteDateModal()
+    {
+        this.setState({isShowDeleteDateModal: true});
+    }
+
+    hideDeleteDateModal()
+    {
+        this.setState({isShowDeleteDateModal: false});
+    }
+
+    async handleDeleteDateSubmit(event)
+    {
+        console.log("handle delete date SUBMIT");
+        // we need to send the NOTSELECTED dates to the server
+        // to update the server
+
+        var notSelectedDates = [];
+
+        for(var i = 0; i < this.state.dates.length; i++)
+        {
+            if(!this.state.dates[i].isSelected)
+            {
+                notSelectedDates.push(
+                    this.state.dates[i].date
+                );
+            }
+        }
+        console.log("not selected dates: " + notSelectedDates);
+
+        try
+        {
+            var url;
+            url = Constants.getRoot() + Constants.deleteDates;
+
+            let body = JSON.stringify({
+                username : this.props.userInfo.username,
+                dates : notSelectedDates
+            });
+
+            let res = await BasePage.CallApiPost(url, body);
+            if(res.status == 200)
+            {
+                await this.props.fetchDataAgain();
+                // this page will be automatically re-rendered
+            }
+            else
+                throw(Constants.postNot200);
+        }
+        catch(e)
+        {
+            this.setState({error: e});
+            console.log('Error on deposit submit' + this.state.error);
+        }
+
+    }
+
+    dateClicked(event)
+    {
+        var index = event.target.value;
+        var tmp = this.state.dates;
+        
+        // toggle selection
+        tmp[index].isSelected = !tmp[index].isSelected;
+
+        this.setState({dates: tmp});
+    }
+
+    renderDeleteDateModal(canRender)
+    {
+        if(!canRender)
+        {
+            return(<div/>);
+        }
+        var selectDates = [];
+        
+        for(var i = 0; i < this.state.dates.length; i++)
+        {
+            selectDates.push(
+                <ListGroupItem
+                    value = {i}
+                    key = {i}
+                    bsStyle = {(this.state.dates[i].isSelected ? "info" : "danger")}
+                    onClick={(event) => this.dateClicked(event)}>
+                        {this.state.dates[i].date}
+                </ListGroupItem>
+            );
+        }
+        return(
+            <Modal show={this.state.isShowDeleteDateModal} onHide={this.hideDeleteDateModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>DELETE DATE MODAL</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ListGroup>
+                        {selectDates}
+                    </ListGroup>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick = {this.hideDeleteDateModal}>Close</Button>
+                    <Button onClick = {this.handleDeleteDateSubmit} bsStyle="success">Update</Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
 
     renderNoLateData()
     {
@@ -234,9 +373,21 @@ class UserItem extends Component
         );
     }
 
+    renderDeleteDatesButton()
+    {
+        return(
+            <Button bsStyle="primary" bsSize="sm" onClick={this.showDeleteDateModal}>
+                Delete Dates
+            </Button>
+        );
+    }
+
     render()
     {
         var lateDates = [];
+        // isDataAcceptable is used for
+        // when the data has no dates
+        // it is a way to run away from an exception
         var isDataAcceptable = true;
         if(this.props.userInfo.dates === null || this.props.userInfo.dates === undefined)
             isDataAcceptable = false;
@@ -249,7 +400,7 @@ class UserItem extends Component
                     date = {this.props.userInfo.dates[i]}/>
             );
         }
-
+        
         return(
             <div className= "User-div-container">
                 <div className = "User-div-left">
@@ -264,37 +415,34 @@ class UserItem extends Component
                 <div className = "User-div-right">
                     {isDataAcceptable ? this.renderLateDates(lateDates) : this.renderNoLateData()}
 
-                    <Button bsStyle="primary" bsSize="large" onClick={this.showDateModal}>
-                        Add Late Date
-                    </Button>
+                    <ButtonToolbar className = "User-div-right">
+                        <Button bsStyle="primary" bsSize="sm" onClick={this.showDateModal}>
+                            Add Late Date
+                        </Button>
 
-                    <Button bsStyle="primary" bsSize="large" onClick={this.showDepositModal}>
-                        Update Deposit
-                    </Button>
+                        <Button bsStyle="primary" bsSize="sm" onClick={this.showDepositModal}>
+                            Update Deposit
+                        </Button>
 
+                        {isDataAcceptable ? this.renderDeleteDatesButton() : <div/>}
+                        
+                    </ButtonToolbar>
+                    
                     {this.renderDateModal()}
                     {this.renderDepositModal()}
+                    {this.renderDeleteDateModal(isDataAcceptable)}
                 </div>
             </div>
         );
     }
 }
 
-/**
- <div>
-                        <form onSubmit={this.handleDateSubmit}>
-                            <label>
-                                Add Late Date:
-                                <textarea value={this.state.dateValue} onChange={this.handleDateChange} />
-                            </label>
-                            <input type="submit" value="Submit" />
-                        </form>
-                    </div>
- */
 const LateDates = (props) =>
 {
     return(
-        <li className = "User-text-right" >{props.date}</li>
+        <li className = "User-text-right" >
+            {props.date}
+        </li>
     );
 }
 

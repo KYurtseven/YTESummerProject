@@ -51,7 +51,7 @@ class Home extends Component
                 {
                     let restext = await res.text();
                     let resJSON = JSON.parse(restext);
-    
+                    
                     resJSON = this.sortByKey(resJSON, 'username');
                     this.setState({isLoading: false, userData: resJSON});
                 }
