@@ -33,6 +33,7 @@ export const postNot200 = 'POST Response status is not 200';
 export const exampleURL = 'api/cassandraExample/';
 export const addDate = 'api/user/addDate/';
 export const updateDeposit = 'api/user/updateDeposit/';
+export const deleteDates = 'api/user/deleteDates/';
 
 export const MOCK_USER_OBJ = 
 [
