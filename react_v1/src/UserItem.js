@@ -22,6 +22,7 @@ class UserItem extends Component
         this.state = {
             dateValue : '',
             depositValue: '',
+            isShowDateTab: false,
             isShowDateModal: false,
             isShowDepositModal: false,
             isShowDeleteDateModal : false,
@@ -48,6 +49,9 @@ class UserItem extends Component
 
         this.showDeleteDateModal = this.showDeleteDateModal.bind(this);
         this.hideDeleteDateModal = this.hideDeleteDateModal.bind(this);
+    
+        this.toggleDateTab = this.toggleDateTab.bind(this);
+        
     }
 
     componentWillMount()
@@ -66,7 +70,7 @@ class UserItem extends Component
         }
         catch(error)
         {
-            console.log('Error useritem componentwillmount: ' + error);
+            //console.log('Error useritem componentwillmount: ' + error);
         }
     }
     // DATE FUNCTIONS
@@ -261,7 +265,6 @@ class UserItem extends Component
 
     async handleDeleteDateSubmit(event)
     {
-        console.log("handle delete date SUBMIT");
         // we need to send the NOTSELECTED dates to the server
         // to update the server
 
@@ -276,8 +279,7 @@ class UserItem extends Component
                 );
             }
         }
-        console.log("not selected dates: " + notSelectedDates);
-
+        
         try
         {
             var url;
@@ -367,7 +369,7 @@ class UserItem extends Component
     renderLateDates(lateDates)
     {
         return(
-            <div>
+            <div className="divTableBody">
                 {lateDates}
             </div>
         );
@@ -379,6 +381,54 @@ class UserItem extends Component
             <Button bsStyle="primary" bsSize="sm" onClick={this.showDeleteDateModal}>
                 Delete Dates
             </Button>
+        );
+    }
+
+    toggleDateTab()
+    {
+        this.setState({isShowDateTab: !this.state.isShowDateTab});
+    }
+
+    renderSubTable(isDataAcceptable, lateDates)
+    {
+        return(
+            <div className="divTableRow" style={{backgroundColor : 'white'}} >
+                <div className="divTableCell"></div>
+                <div className="divTableCell">
+
+                    <div className="divTable Table" >
+                        <div className="divTableHeading">
+                            <div className="divTableRow">
+                                <div className="divTableHead">Dates</div>
+                            </div>
+                        </div>
+                        {isDataAcceptable ? this.renderLateDates(lateDates) : this.renderNoLateData()}
+                    </div>
+                </div>
+
+                <div className="divTableCell">
+                    <Button bsStyle="primary" bsSize="sm" onClick={this.showDateModal}>
+                        Add Late Date
+                    </Button>
+                </div>
+
+                <div className="divTableCell">
+                    <Button bsStyle="primary" bsSize="sm" onClick={this.showDepositModal}>
+                        Update Deposit
+                    </Button>
+                </div>
+
+                <div className="divTableCell">
+                    {isDataAcceptable ? this.renderDeleteDatesButton() : <div/>}
+                </div>
+                
+                <div className="divTableCell">
+                    {this.renderDateModal()}
+                    {this.renderDepositModal()}
+                    {this.renderDeleteDateModal(isDataAcceptable)}
+
+                </div>
+            </div>
         );
     }
 
@@ -400,38 +450,23 @@ class UserItem extends Component
                     date = {this.props.userInfo.dates[i]}/>
             );
         }
-        
+
         return(
-            <div className= "User-div-container">
-                <div className = "User-div-left">
-                    <div className = "User-text-left">
-                        <p>username: {this.props.userInfo.username}</p>
-                        <p>email: {this.props.userInfo.email}</p>
-                        <p>name: {this.props.userInfo.name}</p>
-                        <p>deposit: {this.props.userInfo.deposit}</p>
-                        <p>userType: {this.props.userInfo.usertype}</p>
+            <div className="divTableBody">
+                
+                <div className="divTableRow" style={{background: (this.props.isOdd % 2 == 0 ? '#F5F5F5' : '#EEB2B2')}} >
+                    <div className="divTableCell">
+                        <Button bsStyle = "primary" bsSize = 'sm' onClick = {this.toggleDateTab}>
+                            +
+                        </Button>
                     </div>
+                    <div className="divTableCell">{this.props.userInfo.username}</div>
+                    <div className="divTableCell">{this.props.userInfo.name}</div>
+                    <div className="divTableCell">{this.props.userInfo.email}</div>
+                    <div className="divTableCell">{this.props.userInfo.deposit}</div>
+                    <div className="divTableCell">{this.props.userInfo.usertype}</div>
                 </div>
-                <div className = "User-div-right">
-                    {isDataAcceptable ? this.renderLateDates(lateDates) : this.renderNoLateData()}
-
-                    <ButtonToolbar className = "User-div-right">
-                        <Button bsStyle="primary" bsSize="sm" onClick={this.showDateModal}>
-                            Add Late Date
-                        </Button>
-
-                        <Button bsStyle="primary" bsSize="sm" onClick={this.showDepositModal}>
-                            Update Deposit
-                        </Button>
-
-                        {isDataAcceptable ? this.renderDeleteDatesButton() : <div/>}
-                        
-                    </ButtonToolbar>
-                    
-                    {this.renderDateModal()}
-                    {this.renderDepositModal()}
-                    {this.renderDeleteDateModal(isDataAcceptable)}
-                </div>
+                    {this.state.isShowDateTab ? this.renderSubTable(isDataAcceptable, lateDates) : <div></div>}
             </div>
         );
     }
@@ -440,9 +475,9 @@ class UserItem extends Component
 const LateDates = (props) =>
 {
     return(
-        <li className = "User-text-right" >
-            {props.date}
-        </li>
+        <div className="divTableRow" style = {{}} > 
+            <div className="divTableCell">{props.date}</div>
+        </div>
     );
 }
 

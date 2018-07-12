@@ -5,10 +5,12 @@
   "dependencies": {
     "async": "^2.6.1",
     "cassandra-driver": "^3.5.0",
+    "namor": "^1.0.1",
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "react-table": "^6.8.6"
   },
   "scripts": {
     "start": "react-scripts start",

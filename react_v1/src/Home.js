@@ -4,6 +4,13 @@ import './Home.css';
 import * as Constants from './Constants' ;
 import * as BasePage from './BasePage';
 import UserItem from './UserItem';
+import {
+    Navbar,
+    NavDropdown,
+    NavItem,
+    Nav,
+    MenuItem
+} from 'react-bootstrap';
 
 class Home extends Component
 {
@@ -14,10 +21,7 @@ class Home extends Component
         {
             // initially load the data
             isLoading: true,
-            // when the submit button is pressed
-            isSubmit: false,
             userData : {},
-            submitValue : [],
             error: ''
         }
     }
@@ -71,6 +75,7 @@ class Home extends Component
         await this.componentDidMount();
     }
 
+
     render()
     {
         if(this.state.isLoading)
@@ -91,39 +96,54 @@ class Home extends Component
                         key = {i}
                         userInfo = {this.state.userData[i]}
                         fetchDataAgain = {this.fetchDataAgain.bind(this)}
-                     />
+                        isOdd = {i}
+                    />
                 );
             }
             return(
                 <div className="App">
-                    <header className="App-header" style ={styles.headerstyle}>
-                        <img src={tubitak_logo} style = {styles.tubitak_logo} alt =''/>
-                        <h1 className = "App-title" style = {styles.tubitak_header_text}> TÜBİTAK </h1>
+                    <header className="App-header">
+                        <img src={tubitak_logo} className = "App-logo" alt =''/>
+                        <h1 className = "App-title">TÜBİTAK</h1>
                     </header>
-                    {renderCassandra}
+                    
+
+                    <div style={{marginTop: 20}}/>
+                    
+                    <div style= {{margin: 20}}>
+                        <div className="divTable Table">
+                            <div className="divTableHeading">
+                                <div className="divTableRow">
+                                    <div className="divTableHead" style={{width: 50}} ></div>
+                                    <div className="divTableHead">User name</div>
+                                    <div className="divTableHead">Name</div>
+                                    <div className="divTableHead">E-mail</div>
+                                    <div className="divTableHead" style = {{width:100}} >Deposit</div>
+                                    <div className="divTableHead">User type</div>
+                                </div>
+                            </div>
+                                
+                            {renderCassandra}
+                        
+                        </div>
+                    </div>
                 </div>
             );
         }
     }
 }
-const styles = 
-{
-    tubitak_logo:
-    {
-        float: 'left',
-        height : 75,
-        width : 75,
-    },
-    tubitak_header_text:
-    {
-        fontSize: 40,
-        float: 'center',
-    },
-    headerstyle:
-    {
-        backgroundColor : 'red',
-        height: 100
-    }
-}
+
+/*
+
+
+                    <Navbar className="App-header">
+                        <Navbar.Header >
+                            <Navbar.Brand>
+                            <a>TÜBİTAK</a>
+                            </Navbar.Brand>
+                        </Navbar.Header>
+                    </Navbar> 
+*/
+
 
 export default Home;
