@@ -1,27 +1,24 @@
-
-
 .App {
   text-align: center;
+  /*font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;*/
+  font-family: 'Roboto';
+  color : black;
 }
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.App-logo{
+  float: left;
+  height : 60px;
+  width : 60px;
 }
-
 .App-header {
-  background-color: #222;
-  height: 150px;
+  height: 100px;
   padding: 20px;
-  color: white;
+  background-color: #e53935;
 }
 
 .App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
+  font-size: 40px;
+  float: center;
+  color: rgb(255, 255, 255);
 }
 
 @keyframes App-logo-spin {
@@ -29,25 +26,46 @@
   to { transform: rotate(360deg); }
 }
 
-.User-div-left {
+div.Table {
+  background-color: #EEB2B2;
+  width: 100%;
   text-align: left;
-  display: table-cell;
+  border-collapse: collapse;
 }
-.User-div-right {
-  text-align: right;
-  display: table-cell;
+.divTable.Table .divTableCell, .divTable.Table .divTableHead {
+  border: 1px solid #AAAAAA;
+  padding: 5px 5px;
 }
-.User-div-container{
-  display: table;
-  border-style: ridge;
-  width: 99.5%;
+.divTable.Table .divTableBody .divTableCell {
+  font-size: 15px;
+  font-weight: 400;
+}
+/*
+.divTable.Table .divTableRow:nth-child(even) {
+  background: #F5F5F5;
+}
+*/
+.divTable.Table .divTableHeading {
+  background: #A40000;
+  background: -moz-linear-gradient(top, #bb4040 0%, #ad1919 66%, #A40000 100%);
+  background: -webkit-linear-gradient(top, #bb4040 0%, #ad1919 66%, #A40000 100%);
+  background: linear-gradient(to bottom, #bb4040 0%, #ad1919 66%, #A40000 100%);
+  border-bottom: 2px solid #444444;
+}
+.divTable.Table .divTableHeading .divTableHead {
+  font-size: 16px;
+  font-weight: 400;
+  color: #FFFFFF;
+  text-align: center;
+  border-left: 2px solid #D0E4F5;
+}
+.divTable.Table .divTableHeading .divTableHead:first-child {
+  border-left: none;
+}
 
-  table-layout: fixed;
-}
-.User-text-left{
-  padding-left: 20px; 
-}
-.User-text-right{
-  padding-right: 20px;
-  
-}
+.divTable{ display: table; }
+.divTableRow { display: table-row; }
+.divTableHeading { display: table-header-group;}
+.divTableCell, .divTableHead { display: table-cell;}
+.divTableHeading { display: table-header-group;}
+.divTableBody { display: table-row-group;}
