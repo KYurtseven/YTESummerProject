@@ -1,9 +1,20 @@
 import React, { Component } from 'react';
-import tubitak_logo from './img/tubitak-logo.jpg';
+import tubitak_logo from '../img/tubitak-logo.jpg';
 import './Home.css';
-import * as Constants from './Constants' ;
-import * as BasePage from './BasePage';
+import * as Constants from '../GlobalPages/Constants' ;
+import * as BasePage from '../GlobalPages/BasePage';
+import * as Style from '../GlobalPages/Style';
 import UserItem from './UserItem';
+import 'typeface-roboto';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+
+import {
+    MuiThemeProvider,
+    Button
+} from '@material-ui/core';
+
 import {
     Navbar,
     NavDropdown,
@@ -12,7 +23,7 @@ import {
     MenuItem
 } from 'react-bootstrap';
 
-class Home extends Component
+class AdminHome extends Component
 {
     constructor(props)
     {
@@ -106,7 +117,6 @@ class Home extends Component
                         <img src={tubitak_logo} className = "App-logo" alt =''/>
                         <h1 className = "App-title">TÜBİTAK</h1>
                     </header>
-                    
 
                     <div style={{marginTop: 20}}/>
                     
@@ -127,23 +137,34 @@ class Home extends Component
                         
                         </div>
                     </div>
-                </div>
+              </div>
             );
         }
     }
 }
 
 /*
+                    <MuiThemeProvider theme={Style.theme}>
+                        <AppBar position="static">
+                        <div>
+                            <Button color = "secondary">
+                            <div>Button 1</div>
+                            </Button>
+                            <Button >
+                            <div color = "text" >Button 2</div>
+                            </Button>
+                        </div>
+                        <Typography 
+                            color="secondary"> 
+                            Hİİİİİİ  
+                        </Typography>
 
+                        </AppBar>
+                    </MuiThemeProvider>
+*/
+/*
 
-                    <Navbar className="App-header">
-                        <Navbar.Header >
-                            <Navbar.Brand>
-                            <a>TÜBİTAK</a>
-                            </Navbar.Brand>
-                        </Navbar.Header>
-                    </Navbar> 
 */
 
 
-export default Home;
+export default AdminHome;
