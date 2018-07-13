@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import * as Constants from './Constants' ;
-import * as BasePage from './BasePage';
+import * as Constants from '../GlobalPages/Constants' ;
+import * as BasePage from '../GlobalPages/BasePage';
+
 import './Home.css';
 import {
     Button, 

@@ -65,3 +65,10 @@ export const MOCK_USER_OBJ =
     },
     
 ];
+
+export const MOCK_LOGIN_RESPONSE =
+{
+    "username" : "ADMIN",
+    "usertype" : "admin",
+    "groupid" : "1"
+}
