@@ -1,5 +1,6 @@
 import csv
 from cassandra.cluster import Cluster
+from passlib.hash import pbkdf2_sha256
 
 cluster = Cluster(['127.0.0.1'])
 
@@ -27,9 +28,10 @@ with open('mockuserdata.csv', 'r') as csvfile:
 		password = row[1]
 		usertype = row[2]
 		groupid = row[3]
+		hashpassword = pbkdf2_sha256.hash(password)
 
 		insert = "INSERT INTO YTE.EMPLOYEE(username, password, usertype, groupid) " + \
-				" VALUES('" + username + "', '" + password + "'" +\
+				" VALUES('" + username + "', '" + hashpassword + "'" +\
 				", '" + usertype + "', " + groupid + ") IF NOT EXISTS;"
 
 		session.execute(insert)
@@ -64,6 +66,7 @@ with open('mocklatedata.csv', 'r') as csvfile:
 
 createGroupTable = "CREATE TABLE IF NOT EXISTS YTE.GROUP( " +\
 			" groupid int PRIMARY KEY, " + \
+			" groupname text, " + \
 			" users list<text>);"
 
 session.execute(createGroupTable)
@@ -74,8 +77,8 @@ with open('mockgroupdata.csv', 'r') as csvfile:
 	for row in f:
 		groupid = row[0]
 		users = row[1]
-
-		insert = "INSERT INTO YTE.GROUP(groupid, users) " + \
-				"VALUES (" + groupid + ", " + users + " ) IF NOT EXISTS;"
+		groupname = row[2]
+		insert = "INSERT INTO YTE.GROUP(groupid, users, groupname) " + \
+				"VALUES (" + groupid + ", " + users + ", '" + groupname + "' ) IF NOT EXISTS;"
 		#print("INSERT: ", insert)
 		session.execute(insert)

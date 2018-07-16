@@ -10,8 +10,7 @@ import {
     ControlLabel,
     FormControl,
     ListGroup,
-    ListGroupItem,
-    ButtonToolbar
+    ListGroupItem
 } from 'react-bootstrap';
 
 
@@ -60,10 +59,10 @@ class UserItem extends Component
         try
         {
             var myarr = []
-            for(var i = 0; i < this.props.userInfo.dates.length; i++)
+            for(var i = 0; i < this.props.userData.dates.length; i++)
             {
                 let tmpval = {};
-                tmpval.date = this.props.userInfo.dates[i];
+                tmpval.date = this.props.userData.dates[i];
                 tmpval.isSelected = false;
                 myarr.push(tmpval);
             }
@@ -85,20 +84,20 @@ class UserItem extends Component
     // post to the database
     async handleDateSubmit(event)
     {
-        if(BasePage.isValidDate(this.state.dateValue) == 'success')
+        if(BasePage.isValidDate(this.state.dateValue) === 'success')
         {
             var url;
             url = Constants.getRoot() + Constants.addDate;
 
             let body = JSON.stringify({
-                username : this.props.userInfo.username,
+                username : this.props.userData.username,
                 date : this.state.dateValue
             });
 
             try
             {
                 let res = await BasePage.CallApiPost(url, body);
-                if(res.status == 200)
+                if(res.status === 200)
                 {
                     await this.props.fetchDataAgain();
                 }
@@ -179,7 +178,7 @@ class UserItem extends Component
             url = Constants.getRoot() + Constants.updateDeposit;
 
             let body = JSON.stringify({
-                username : this.props.userInfo.username,
+                username : this.props.userData.username,
                 deposit : this.state.depositValue
             });
             //BasePage.CallApiPost(url, body).done(() => {});
@@ -187,7 +186,7 @@ class UserItem extends Component
             try
             {
                 let res = await BasePage.CallApiPost(url, body);
-                if(res.status == 200)
+                if(res.status === 200)
                 {
                     await this.props.fetchDataAgain();
                     // this page will be automatically re-rendered
@@ -227,7 +226,7 @@ class UserItem extends Component
                     <form>
                         <FormGroup
                         controlId = "formBasicText"
-                        validationState = {(!isNaN(this.state.depositValue) && this.state.depositValue != '') ? 'success' : 'error'}
+                        validationState = {(!isNaN(this.state.depositValue) && this.state.depositValue !== '') ? 'success' : 'error'}
                         >
                         <ControlLabel>Enter deposit</ControlLabel>
                         <FormControl
@@ -287,12 +286,12 @@ class UserItem extends Component
             url = Constants.getRoot() + Constants.deleteDates;
 
             let body = JSON.stringify({
-                username : this.props.userInfo.username,
+                username : this.props.userData.username,
                 dates : notSelectedDates
             });
 
             let res = await BasePage.CallApiPost(url, body);
-            if(res.status == 200)
+            if(res.status === 200)
             {
                 await this.props.fetchDataAgain();
                 // this page will be automatically re-rendered
@@ -440,32 +439,32 @@ class UserItem extends Component
         // when the data has no dates
         // it is a way to run away from an exception
         var isDataAcceptable = true;
-        if(this.props.userInfo.dates === null || this.props.userInfo.dates === undefined)
+        if(this.props.userData.dates === null || this.props.userData.dates === undefined)
             isDataAcceptable = false;
     
-        for(var i = 0; isDataAcceptable && i < this.props.userInfo.dates.length; i++)
+        for(var i = 0; isDataAcceptable && i < this.props.userData.dates.length; i++)
         {
             lateDates.push(
                 <LateDates 
                     key = {i}
-                    date = {this.props.userInfo.dates[i]}/>
+                    date = {this.props.userData.dates[i]}/>
             );
         }
 
         return(
             <div className="divTableBody">
                 
-                <div className="divTableRow" style={{background: (this.props.isOdd % 2 == 0 ? '#F5F5F5' : '#EEB2B2')}} >
+                <div className="divTableRow" style={{background: (this.props.isOdd % 2 === 0 ? '#F5F5F5' : '#EEB2B2')}} >
                     <div className="divTableCell">
                         <Button bsStyle = "primary" bsSize = 'sm' onClick = {this.toggleDateTab}>
                             +
                         </Button>
                     </div>
-                    <div className="divTableCell">{this.props.userInfo.username}</div>
-                    <div className="divTableCell">{this.props.userInfo.name}</div>
-                    <div className="divTableCell">{this.props.userInfo.email}</div>
-                    <div className="divTableCell">{this.props.userInfo.deposit}</div>
-                    <div className="divTableCell">{this.props.userInfo.usertype}</div>
+                    <div className="divTableCell">{this.props.userData.username}</div>
+                    <div className="divTableCell">{this.props.userData.name}</div>
+                    <div className="divTableCell">{this.props.userData.email}</div>
+                    <div className="divTableCell">{this.props.userData.deposit}</div>
+                    <div className="divTableCell">{this.props.userData.usertype}</div>
                 </div>
                     {this.state.isShowDateTab ? this.renderSubTable(isDataAcceptable, lateDates) : <div></div>}
             </div>
