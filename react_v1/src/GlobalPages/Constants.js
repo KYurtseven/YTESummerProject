@@ -30,45 +30,66 @@ export const getNot200 = 'GET Response status is not 200';
 export const postNot200 = 'POST Response status is not 200';
 
 // API'S
-export const exampleURL = 'api/cassandraExample/';
-export const addDate = 'api/user/addDate/';
-export const updateDeposit = 'api/user/updateDeposit/';
-export const deleteDates = 'api/user/deleteDates/';
+export const addDate        = 'api/user/addDate';
+export const updateDeposit  = 'api/user/updateDeposit';
+export const deleteDates    = 'api/user/deleteDates';
+export const login          = 'api/login/';
 
-export const MOCK_USER_OBJ = 
-[
-    {
-        "username" : "u0",
-        "dates":
-        [
-         "2018-07-03 16:10:31",
-         "2018-07-04 10:20:30",
-         "2018-07-05 11:11:20"
-        ],
-        "deposit": "50",
-        "name": "Koray Yurtseven",
-        "email": "koray.yurtseven@asd.com",
-        "usertype": "admin"
-    },
-    {
-        "username" : "u1",
-        "dates":
-        [
-        "2018-07-06 12:00:00",
-        "2018-07-07 13:00:00",
-        "2018-07-08 14:00:00"
-        ],
-        "deposit": "40",
-        "name": "Egemen",
-        "email": "egemen@asd.com",
-        "usertype": "admin"
-    },
-    
-];
+// ADMIN API'S
+export const adminFetch     = 'api/admin/fetch/';
+
+// USER API'S
+export const userFetch      = 'api/user/fetch/';
+export const MOCK_ADMIN_OBJ = 
+{
+    "groupname" : "MGM",
+    "users" :
+    [
+        {
+            "username" : "u0",
+            "dates":
+            [
+             "2018-07-03 16:10:31",
+             "2018-07-04 10:20:30",
+             "2018-07-05 11:11:20"
+            ],
+            "deposit": "50",
+            "name": "Koray Yurtseven",
+            "email": "koray.yurtseven@asd.com",
+            "usertype": "admin"
+        },
+        {
+            "username" : "u1",
+            "dates":
+            [
+            "2018-07-06 12:00:00",
+            "2018-07-07 13:00:00",
+            "2018-07-08 14:00:00"
+            ],
+            "deposit": "40",
+            "name": "Egemen",
+            "email": "egemen@asd.com",
+            "usertype": "admin"
+        },
+    ]
+}
+
+export const MOCK_USER_OBJ =
+{
+    "username": "anilaydin",
+    "dates": [
+        "2000-01-01",
+        "2001-01-01"
+    ],
+    "deposit": 25,
+    "email": "u1@u1.com",
+    "name": "Anıl Aydın",
+    "usertype": "user"
+}
 
 export const MOCK_LOGIN_RESPONSE =
 {
-    "username" : "ADMIN",
+    "username" : "user",
     "usertype" : "admin",
     "groupid" : "1"
 }

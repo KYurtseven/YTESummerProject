@@ -3,25 +3,9 @@ import tubitak_logo from '../img/tubitak-logo.jpg';
 import './Home.css';
 import * as Constants from '../GlobalPages/Constants' ;
 import * as BasePage from '../GlobalPages/BasePage';
-import * as Style from '../GlobalPages/Style';
 import UserItem from './UserItem';
 import 'typeface-roboto';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-
-import {
-    MuiThemeProvider,
-    Button
-} from '@material-ui/core';
-
-import {
-    Navbar,
-    NavDropdown,
-    NavItem,
-    Nav,
-    MenuItem
-} from 'react-bootstrap';
+import Cookies from "universal-cookie";
 
 class AdminHome extends Component
 {
@@ -33,6 +17,8 @@ class AdminHome extends Component
             // initially load the data
             isLoading: true,
             userData : {},
+            userInfo : {},
+            groupname: '',
             error: ''
         }
     }
@@ -49,26 +35,30 @@ class AdminHome extends Component
     {
         if(Constants.IS_MOCK)
         {
-            var tmp = Constants.MOCK_USER_OBJ;
-
-            this.setState({isLoading: false, userData: tmp});
+            var tmp = Constants.MOCK_ADMIN_OBJ;
+            this.setState({userData: tmp.users, groupname: tmp.groupname, isLoading: false});
         }
         else
         {
             this.setState({isLoading: true});
             var url;
-            url = Constants.getRoot() + Constants.exampleURL;
+            const cookies = new Cookies();
 
+            this.setState({userInfo : cookies.get('userInfo')})
+            
+            url = Constants.getRoot() + Constants.adminFetch + cookies.get('userInfo').groupid;
+            
             try
             {
                 let res = await BasePage.CallApiGet(url);
-                if(res.status == 200)
+                if(res.status === 200)
                 {
                     let restext = await res.text();
                     let resJSON = JSON.parse(restext);
                     
-                    resJSON = this.sortByKey(resJSON, 'username');
-                    this.setState({isLoading: false, userData: resJSON});
+                    let users = resJSON.users;
+                    users = this.sortByKey(users, 'username');
+                    this.setState({userData: users, groupname: resJSON.groupname, isLoading: false});
                 }
                 else
                     throw(Constants.getNot200);
@@ -105,7 +95,7 @@ class AdminHome extends Component
                 renderCassandra.push(
                     <UserItem
                         key = {i}
-                        userInfo = {this.state.userData[i]}
+                        userData = {this.state.userData[i]}
                         fetchDataAgain = {this.fetchDataAgain.bind(this)}
                         isOdd = {i}
                     />
@@ -120,6 +110,7 @@ class AdminHome extends Component
 
                     <div style={{marginTop: 20}}/>
                     
+                    <div> <h1> {this.state.groupname} </h1> </div>
                     <div style= {{margin: 20}}>
                         <div className="divTable Table">
                             <div className="divTableHeading">
@@ -143,28 +134,6 @@ class AdminHome extends Component
     }
 }
 
-/*
-                    <MuiThemeProvider theme={Style.theme}>
-                        <AppBar position="static">
-                        <div>
-                            <Button color = "secondary">
-                            <div>Button 1</div>
-                            </Button>
-                            <Button >
-                            <div color = "text" >Button 2</div>
-                            </Button>
-                        </div>
-                        <Typography 
-                            color="secondary"> 
-                            Hİİİİİİ  
-                        </Typography>
-
-                        </AppBar>
-                    </MuiThemeProvider>
-*/
-/*
-
-*/
 
 
 export default AdminHome;
