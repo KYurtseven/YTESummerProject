@@ -25,9 +25,22 @@ class Login extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     
-    async componentWillMount()
+    componentWillMount()
     {
-
+        const cookies = new Cookies();
+        let tmpcookie = cookies.get('userInfo')
+        if(tmpcookie)
+        {
+            if(tmpcookie.usertype === 'admin')
+            {
+                this.props.history.push('/admin/');
+            }
+            else if(tmpcookie.usertype === 'user')
+            {
+                this.props.history.push('/user/');
+            }
+        }
+            
     }
 
     handleUsernameChange(event)
@@ -76,7 +89,7 @@ class Login extends React.Component {
             {
                 let res = await BasePage.CallApiGet(url);
 
-                if(res.status === 200 && res.error != '')
+                if(res.status === 200 && res.error !== '')
                 {
                     let restext = await res.text();
                     let resJSON = JSON.parse(restext);

@@ -8,7 +8,7 @@ session = cluster.connect('yte')
 
 app = FlaskAPI(__name__)
 
-@app.route('/api/user/addDate', methods = ['POST'])
+@app.route('/api/admin/addDate', methods = ['POST'])
 def addDate():
 	username = request.get_json(force=True).get('username')
 	date = request.get_json(force=True).get('date')
@@ -20,7 +20,7 @@ def addDate():
 	ret = {'username': username, 'date': date}
 	return ret
 
-@app.route('/api/user/updateDeposit', methods = ['POST'])
+@app.route('/api/admin/updateDeposit', methods = ['POST'])
 def updateDeposit():
 
 	username = request.get_json(force=True).get('username')
@@ -34,7 +34,7 @@ def updateDeposit():
 	ret = {'username' : username, 'deposit' : deposit}
 	return ret
 
-@app.route('/api/user/deleteDates', methods = ['POST'])
+@app.route('/api/admin/deleteDates', methods = ['POST'])
 def deleteDates():
 	username = request.get_json(force=True).get('username')
 	dates = request.get_json(force=True).get('dates')
@@ -49,6 +49,70 @@ def deleteDates():
 
 	#TO DO
 	return {'name' : 'hi'}
+
+@app.route('/api/general/updateEmail', methods = ['POST'])
+def updateEmail():
+	username = request.get_json(force=True).get('username')
+	newmail = request.get_json(force=True).get('email')
+
+	query = "UPDATE YTE.LATE SET email = '" + newmail + "' WHERE username = '" + username + "'"
+
+	try:
+		# now, we know the usertype, groupid
+		session.execute(query)
+	except Exception as e:
+		return{
+			'error' : str(e)
+		}
+	#TO DO
+	return {'name' : 'hi'}
+
+@app.route('/api/admin/addUser', methods = ['POST'])
+def addUser():
+	username = request.get_json(force=True).get('username')
+	groupid = request.get_json(force=True).get('groupid')
+	email = request.get_json(force=True).get('email')
+	password = request.get_json(force=True).get('password')
+	name = request.get_json(force=True).get('name')
+	usertype = 'user'
+	
+	# first, check whether there is a user with that name
+	queryCheck = "SELECT username from YTE.EMPLOYEE where username = '" + username + "'"
+
+	try:
+		a = session.execute(queryCheck)
+		for row in a:
+			raise Exception('Username ' + username + ' exists')
+	except Exception as e:
+		return{
+			'error' : str(e)
+		}
+	hashpassword = pbkdf2_sha256.hash(password)
+
+	#add employee
+	queryAddEmployee = 	"INSERT INTO YTE.EMPLOYEE (username, password, usertype) " + \
+						" VALUES('" + username + "', '" + hashpassword + "'" + \
+						", '" + usertype + "')"
+	
+	session.execute(queryAddEmployee)
+
+	# now create late data for that employee
+	deposit = 50
+	queryAddLate =  "INSERT INTO YTE.LATE (username, deposit, email, name, usertype) " +\
+					" VALUES ('" + username + "', " + str(deposit) + ", '" + email + "'" +\
+					", '" + name + "', '" + usertype + "')"
+	session.execute(queryAddLate)
+
+	# now add this user to the admin's group
+	
+	queryAddGroup = "UPDATE YTE.GROUP SET users = users + ['" + username + "'] WHERE groupid = " + str(groupid)
+	session.execute(queryAddGroup)
+
+	# TO DO
+	return {
+		'name' : 'hi',
+		'error' : ''
+	}
 
 @app.route('/api/admin/fetch/<int:groupid>', methods = ['GET'])
 def fetchAdminData(groupid):
@@ -115,7 +179,6 @@ def fetchUserData(username):
 			'usertype' : tmp['usertype']
 		}
 
-# TO DO
 @app.route('/api/login/<string:username>/<string:password>', methods = ['GET'])
 def login(username, password):
 

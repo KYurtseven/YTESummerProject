@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as Constants from '../GlobalPages/Constants' ;
 import * as BasePage from '../GlobalPages/BasePage';
 
-import './Home.css';
+import '../GlobalPages/Home.css';
 import {
     Button, 
     Modal,
@@ -341,7 +341,7 @@ class UserItem extends Component
         return(
             <Modal show={this.state.isShowDeleteDateModal} onHide={this.hideDeleteDateModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>DELETE DATE MODAL</Modal.Title>
+                    <Modal.Title>DELETE DATE</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <ListGroup>
