@@ -1,11 +1,11 @@
 import React from 'react';
 import * as Constants from '../GlobalPages/Constants';
 import * as BasePage from '../GlobalPages/BasePage';
-import tubitak_logo from '../img/tubitak-logo.jpg';
-
+import Header from '../GlobalPages/Header';
+import '../GlobalPages/Home.css';
 import Cookies from "universal-cookie";
 import {
-    Button
+    Button,
 } from 'react-bootstrap';
 
 
@@ -41,28 +41,37 @@ class UserHome extends React.Component
             this.setState({isLoading: true});
             var url;
             const cookies = new Cookies();
-
-            this.setState({userInfo : cookies.get('userInfo')})
+            let userInfo = cookies.get('userInfo');
+            this.setState({userInfo : userInfo});
             
-            url = Constants.getRoot() + Constants.userFetch + cookies.get('userInfo').username;
-            
-            try
+            if(userInfo)
             {
-                let res = await BasePage.CallApiGet(url);
-                if(res.status === 200)
+                url = Constants.getRoot() + Constants.userFetch + cookies.get('userInfo').username;
+            
+                try
                 {
-                    let restext = await res.text();
-                    let resJSON = JSON.parse(restext);
-                    
-                    this.setState({isLoading: false, userData: resJSON});
+                    let res = await BasePage.CallApiGet(url);
+                    if(res.status === 200)
+                    {
+                        let restext = await res.text();
+                        let resJSON = JSON.parse(restext);
+                        
+                        this.setState({isLoading: false, userData: resJSON});
+                    }
+                    else
+                        throw(Constants.getNot200);
                 }
-                else
-                    throw(Constants.getNot200);
+                catch(e)
+                {
+                    this.setState({error: e});
+                    console.log('Error on fetching data: ' + e);
+                }
             }
-            catch(e)
+            else
             {
-                this.setState({error: e});
-                console.log('Error on fetching data: ' + e);
+                // probably cookie is corrupted
+                console.log('no cookie is present');
+                this.setState({isLoading: true});
             }
         }
     }
@@ -122,6 +131,7 @@ class UserHome extends React.Component
             </div>
             );
     }
+
     render()
     {
         if(this.state.isLoading)
@@ -143,13 +153,13 @@ class UserHome extends React.Component
             );
         }
 
+       
         return(
             <div className="App">
-                <header className="App-header">
-                    <img src={tubitak_logo} className = "App-logo" alt =''/>
-                    <h1 className = "App-title">TÜBİTAK</h1>
-                </header>
-
+                
+                <Header
+                    history = {this.props.history}/>
+                
                 <div style={{marginTop: 20}}/>
                     
                 <div style= {{margin: 20}}>

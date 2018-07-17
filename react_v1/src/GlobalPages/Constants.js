@@ -30,16 +30,19 @@ export const getNot200 = 'GET Response status is not 200';
 export const postNot200 = 'POST Response status is not 200';
 
 // API'S
-export const addDate        = 'api/user/addDate';
-export const updateDeposit  = 'api/user/updateDeposit';
-export const deleteDates    = 'api/user/deleteDates';
 export const login          = 'api/login/';
+export const changeEmail    = 'api/general/updateEmail';
 
 // ADMIN API'S
 export const adminFetch     = 'api/admin/fetch/';
+export const addDate        = 'api/admin/addDate';
+export const updateDeposit  = 'api/admin/updateDeposit';
+export const deleteDates    = 'api/admin/deleteDates';
+export const addUser        = 'api/admin/addUser';
 
 // USER API'S
 export const userFetch      = 'api/user/fetch/';
+
 export const MOCK_ADMIN_OBJ = 
 {
     "groupname" : "MGM",
