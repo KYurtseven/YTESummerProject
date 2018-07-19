@@ -2,56 +2,69 @@ import React, { Component } from 'react';
 import * as Constants from '../GlobalPages/Constants' ;
 import * as BasePage from '../GlobalPages/BasePage';
 
-import '../GlobalPages/Home.css';
-import {
-    Button, 
-    Modal,
-    FormGroup,
-    ControlLabel,
-    FormControl,
-    ListGroup,
-    ListGroupItem
-} from 'react-bootstrap';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import AppBar from '@material-ui/core/AppBar';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Divider from '@material-ui/core/Divider';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import Checkbox from '@material-ui/core/Checkbox';
+import DeleteIcon from '@material-ui/icons/Delete';
+import AddIcon from '@material-ui/icons/Add';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
+import TextField from '@material-ui/core/TextField';
 
-
-class UserItem extends Component 
+class UserItem extends Component
 {
+
     constructor(props)
     {
         super(props);
         this.state = {
+            whichTab : 'details',
+            dates : {},
+            selectedDateNumber : 0,
+            isDeleteDialogShow: false,
+            isAddDateDialogShow : false,
+            isUpdateDepositShow: false,
             dateValue : '',
-            depositValue: '',
-            isShowDateTab: false,
-            isShowDateModal: false,
-            isShowDepositModal: false,
-            isShowDeleteDateModal : false,
-            dates : [],
-            error: ''
         };
 
-        // Add Date
-        this.handleDateChange = this.handleDateChange.bind(this);
-        this.handleDateSubmit = this.handleDateSubmit.bind(this);
-
-        this.showDateModal = this.showDateModal.bind(this);
-        this.hideDateModal = this.hideDateModal.bind(this);
-
-        // Deposit
-        this.handleDepositChange = this.handleDepositChange.bind(this);
-        this.handleDepositSubmit = this.handleDepositSubmit.bind(this);
-   
-        this.showDepositModal = this.showDepositModal.bind(this);
-        this.hideDepositModal = this.hideDepositModal.bind(this);
-
-        // Delete Date
+        this.handleTabChange = this.handleTabChange.bind(this);
+        
+        this.handleDeleteDateDialogShow = this.handleDeleteDateDialogShow.bind(this);
+        this.handleDeleteDateDailogHide = this.handleDeleteDateDailogHide.bind(this);
         this.handleDeleteDateSubmit = this.handleDeleteDateSubmit.bind(this);
 
-        this.showDeleteDateModal = this.showDeleteDateModal.bind(this);
-        this.hideDeleteDateModal = this.hideDeleteDateModal.bind(this);
+        this.handleAddDateDialogShow = this.handleAddDateDialogShow.bind(this);
+        this.handleAddDateDialogHide = this.handleAddDateDialogHide.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
+        this.handleAddDateSubmit = this.handleAddDateSubmit.bind(this);
     
-        this.toggleDateTab = this.toggleDateTab.bind(this);
-        
+        this.handleDepositChange = this.handleDepositChange.bind(this);
+        this.handleUpdateDepositHide = this.handleUpdateDepositHide.bind(this);
+        this.handleUpdateDepositShow = this.handleUpdateDepositShow.bind(this);
+        this.handleDepositSubmit = this.handleDepositSubmit.bind(this);
+
     }
 
     componentWillMount()
@@ -64,6 +77,7 @@ class UserItem extends Component
                 let tmpval = {};
                 tmpval.date = this.props.userData.dates[i];
                 tmpval.isSelected = false;
+                tmpval.id = i;
                 myarr.push(tmpval);
             }
             this.setState({dates : myarr});
@@ -72,102 +86,57 @@ class UserItem extends Component
         {
             //console.log('Error useritem componentwillmount: ' + error);
         }
-    }
-    // DATE FUNCTIONS
 
-    // sets state of the date entry
-    handleDateChange(event)
-    {
-        this.setState({dateValue: event.target.value});
     }
 
-    // post to the database
-    async handleDateSubmit(event)
-    {
-        if(BasePage.isValidDate(this.state.dateValue) === 'success')
+    handleRowClick = (event, id) => {
+        let tmp = this.state.dates;
+        let oldNumber = this.state.selectedDateNumber;
+
+        let selectedIndex;
+        for(var i = 0; i < this.state.dates.length; i++)
         {
-            var url;
-            url = Constants.getRoot() + Constants.addDate;
-
-            let body = JSON.stringify({
-                username : this.props.userData.username,
-                date : this.state.dateValue
-            });
-
-            try
+            if(id === tmp[i].id)
             {
-                let res = await BasePage.CallApiPost(url, body);
-                if(res.status === 200)
-                {
-                    await this.props.fetchDataAgain();
-                }
-                else
-                    throw(Constants.postNot200);
+                selectedIndex = i;
+                break;
             }
-            catch(e)
-            {
-                this.setState({error: e});
-                console.log('Error on date submit: ' + this.state.error);
-            }
+        }
+        console.log('selectedIndex: ' + selectedIndex);
+
+        if(tmp[selectedIndex].isSelected)
+        {
+            tmp[selectedIndex].isSelected =false;
+            oldNumber = oldNumber - 1;
         }
         else
         {
-            alert('Please enter date as yyyy-MM-dd, entered value was: ' + this.state.dateValue);
+            tmp[selectedIndex].isSelected = true;
+            oldNumber = oldNumber + 1;
         }
-    }
+        
+        this.setState({ dates: tmp, selectedDateNumber: oldNumber });
+    };
 
-    showDateModal()
+    handleTabChange = (event, value) => {
+        this.setState({whichTab: value });
+    };
+
+    handleUpdateDepositShow()
     {
-        this.setState({isShowDateModal: true});
+        this.setState({isUpdateDepositShow: true});
     }
 
-    hideDateModal() {
-        this.setState({isShowDateModal: false});
-    }
-
-    renderDateModal()
+    handleUpdateDepositHide()
     {
-        return(
-            <Modal show={this.state.isShowDateModal} onHide={this.hideDateModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add Late Date</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form>
-                        <FormGroup
-                        controlId = "formBasicText"
-                        validationState = {BasePage.isValidDate(this.state.dateValue)}
-                        >
-                        <ControlLabel>Enter late date, format is yyyy-MM-dd</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.dateValue}
-                            placeholder="Enter text"
-                            onChange={this.handleDateChange}
-                        />
-                        <FormControl.Feedback />
-                        </FormGroup>
-                    </form>
-
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick = {this.hideDateModal}>Close</Button>
-                    <Button onClick = {this.handleDateSubmit} bsStyle="success">ADD</Button>
-                </Modal.Footer>
-            </Modal>
-        );
+        this.setState({isUpdateDepositShow: false});
     }
 
-    // END OF DATE FUNCTIONS
-    
-    
-    // DEPOSIT FUNCTIONS
-
-    // sets state of the deposit entry
     handleDepositChange(event)
     {
         this.setState({depositValue: event.target.value});
     }
+    
 
     // post to the database
     async handleDepositSubmit(event)
@@ -206,63 +175,89 @@ class UserItem extends Component
         }
     }
 
-    showDepositModal()
-    {
-        this.setState({isShowDepositModal: true});
-    }
-
-    hideDepositModal() {
-        this.setState({isShowDepositModal: false});
-    }
-
-    renderDepositModal()
+    renderUpdateDeposit()
     {
         return(
-            <Modal show={this.state.isShowDepositModal} onHide={this.hideDepositModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Update Deposit</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form>
-                        <FormGroup
-                        controlId = "formBasicText"
-                        validationState = {(!isNaN(this.state.depositValue) && this.state.depositValue !== '') ? 'success' : 'error'}
-                        >
-                        <ControlLabel>Enter deposit</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.depositValue}
-                            placeholder="Enter value"
+            <Dialog
+                open={this.state.isUpdateDepositShow}
+                onClose = {this.handleUpdateDepositHide}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                >
+                <DialogTitle id="alert-dialog-title">{"Update Deposit for "}{this.props.userData.username}</DialogTitle>
+                <DialogContent>
+                    <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                        <TextField
+                            id="deposit"
+                            label="New Deposit"
+                            type="number"
                             onChange={this.handleDepositChange}
+                            style={{width: 200}}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
                         />
-                        <FormControl.Feedback />
-                        </FormGroup>
                     </form>
-
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick = {this.hideDepositModal}>Close</Button>
-                    <Button onClick = {this.handleDepositSubmit} bsStyle="success">Update</Button>
-                </Modal.Footer>
-            </Modal>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleUpdateDepositHide} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={this.handleDepositSubmit} color="primary" autoFocus>
+                        Submit
+                    </Button>
+                </DialogActions>
+            </Dialog>
         );
     }
 
-    // END OF DEPOSIT FUNCTIONS
+    renderUserDetails()
+    {
+        return(
+            <List component="nav">
+                <ListItem>
+                    <ListItemText 
+                        primary = 'Username'
+                        secondary = {this.props.userData.username} />
+                </ListItem>
+                
+                <Divider/>
+                
+                <ListItem>
+                    <ListItemText 
+                        primary = "Email" 
+                        secondary = {this.props.userData.email}/>
+                </ListItem>
+                
+                <Divider/>
 
+                <ListItem>
+                    <ListItemText 
+                        primary = "Deposit"
+                        secondary = {this.props.userData.deposit} />
+                    
+                    <Tooltip title="Update deposit">
+                        <IconButton 
+                            aria-label="Add" 
+                            style={{float: 'right'}}
+                            onClick = {this.handleUpdateDepositShow}>
+                            <AddIcon />
+                        </IconButton>
+                    </Tooltip>
+                    {this.state.isUpdateDepositShow ? this.renderUpdateDeposit() : <div/>}
+                </ListItem>
+                
+                <Divider/>
+                
+                <ListItem >
+                    <ListItemText 
+                        primary = "User Type"
+                        secondary = {this.props.userData.usertype} />
+                </ListItem>
+            </List>
+        );
+    }
     
-    // DELETE DATE FUNCTIONS
-
-    showDeleteDateModal()
-    {
-        this.setState({isShowDeleteDateModal: true});
-    }
-
-    hideDeleteDateModal()
-    {
-        this.setState({isShowDeleteDateModal: false});
-    }
-
     async handleDeleteDateSubmit(event)
     {
         // we need to send the NOTSELECTED dates to the server
@@ -307,178 +302,241 @@ class UserItem extends Component
 
     }
 
-    dateClicked(event)
+    renderDeleteDateButton()
     {
-        var index = event.target.value;
-        var tmp = this.state.dates;
-        
-        // toggle selection
-        tmp[index].isSelected = !tmp[index].isSelected;
 
-        this.setState({dates: tmp});
-    }
-
-    renderDeleteDateModal(canRender)
-    {
-        if(!canRender)
-        {
-            return(<div/>);
-        }
-        var selectDates = [];
-        
-        for(var i = 0; i < this.state.dates.length; i++)
-        {
-            selectDates.push(
-                <ListGroupItem
-                    value = {i}
-                    key = {i}
-                    bsStyle = {(this.state.dates[i].isSelected ? "info" : "danger")}
-                    onClick={(event) => this.dateClicked(event)}>
-                        {this.state.dates[i].date}
-                </ListGroupItem>
-            );
-        }
         return(
-            <Modal show={this.state.isShowDeleteDateModal} onHide={this.hideDeleteDateModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>DELETE DATE</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <ListGroup>
-                        {selectDates}
-                    </ListGroup>
+            <div>
 
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick = {this.hideDeleteDateModal}>Close</Button>
-                    <Button onClick = {this.handleDeleteDateSubmit} bsStyle="success">Update</Button>
-                </Modal.Footer>
-            </Modal>
+            <Tooltip title="Delete dates">
+                <IconButton 
+                    aria-label="Delete" 
+                    style={{float: 'right'}}
+                    onClick = {this.handleDeleteDateDialogShow}>
+                    
+                    <DeleteIcon />
+                </IconButton>
+            </Tooltip>
+
+            <Dialog
+                open={this.state.isDeleteDialogShow}
+                onClose = {this.handleDeleteDateDailogHide}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                >
+                <DialogTitle id="alert-dialog-title">{"Confirmation"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Do you want to delete selected dates for {this.props.userData.username}?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleDeleteDateDailogHide} color="primary">
+                        Disagree
+                    </Button>
+                    <Button onClick={this.handleDeleteDateSubmit} color="primary" autoFocus>
+                        Agree
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            </div>
         );
     }
 
-    renderNoLateData()
+    handleDeleteDateDialogShow()
+    {
+        console.log('open pressed');
+        this.setState({isDeleteDialogShow: true});
+    }
+
+    handleDeleteDateDailogHide()
+    {
+        console.log('hide pressed');
+        this.setState({isDeleteDialogShow: false});
+        
+    }
+
+    handleAddDateDialogShow()
+    {
+        this.setState({isAddDateDialogShow: true});
+    }
+
+    handleAddDateDialogHide()
+    {
+        this.setState({isAddDateDialogShow: false});
+    }
+    
+    handleDateChange(event)
+    {
+        console.log('dateValue: ' + event.target.value);
+        this.setState({dateValue: event.target.value});
+    }
+
+    
+    // post to the database
+    async handleAddDateSubmit(event)
+    {
+        if(BasePage.isValidDate(this.state.dateValue) === 'success')
+        {
+            var url;
+            url = Constants.getRoot() + Constants.addDate;
+
+            let body = JSON.stringify({
+                username : this.props.userData.username,
+                date : this.state.dateValue
+            });
+
+            try
+            {
+                let res = await BasePage.CallApiPost(url, body);
+                if(res.status === 200)
+                {
+                    await this.props.fetchDataAgain();
+                }
+                else
+                    throw(Constants.postNot200);
+            }
+            catch(e)
+            {
+                this.setState({error: e});
+                console.log('Error on date submit: ' + this.state.error);
+            }
+        }
+        else
+        {
+            alert('Please enter date as yyyy-MM-dd, entered value was: ' + this.state.dateValue);
+        }
+    }
+
+    renderAddDateButton()
     {
         return(
             <div>
-                <p className= "User-text-right">No Late Data</p>
+            <Tooltip title="Add dates">
+                <IconButton 
+                    aria-label="Add" 
+                    style={{float: 'right'}}
+                    onClick = {this.handleAddDateDialogShow}>
+                    <AddIcon />
+                </IconButton>
+            </Tooltip>
+
+            <Dialog
+                open={this.state.isAddDateDialogShow}
+                onClose = {this.handleAddDateDialogHide}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                >
+                <DialogTitle id="alert-dialog-title">{"Add a date for "}{this.props.userData.username}</DialogTitle>
+                <DialogContent>
+                    <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                        <TextField
+                            id="date"
+                            label="New Date"
+                            type="date"
+                            onChange={this.handleDateChange}
+                            style={{width: 200}}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                        />
+                    </form>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleAddDateDialogHide} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={this.handleAddDateSubmit} color="primary" autoFocus>
+                        Submit
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             </div>
         );
     }
 
-    renderLateDates(lateDates)
+    renderUserDates(isDataAcceptable)
     {
+        if(!isDataAcceptable)
+        {
+            return(
+                <Paper style = {{width: '100%', overflowX : 'auto'}} >
+                    <Typography style={{fontSize: 15}}>No Late Data</Typography>
+                    {this.renderAddDateButton()}
+                </Paper>
+
+            );
+        }
+        var data = this.state.dates;
+
         return(
-            <div className="divTableBody">
-                {lateDates}
-            </div>
-        );
-    }
-
-    renderDeleteDatesButton()
-    {
-        return(
-            <Button bsStyle="primary" bsSize="sm" onClick={this.showDeleteDateModal}>
-                Delete Dates
-            </Button>
-        );
-    }
-
-    toggleDateTab()
-    {
-        this.setState({isShowDateTab: !this.state.isShowDateTab});
-    }
-
-    renderSubTable(isDataAcceptable, lateDates)
-    {
-        return(
-            <div className="divTableRow" style={{backgroundColor : 'white'}} >
-                <div className="divTableCell"></div>
-                <div className="divTableCell">
-
-                    <div className="divTable Table" >
-                        <div className="divTableHeading">
-                            <div className="divTableRow">
-                                <div className="divTableHead">Dates</div>
-                            </div>
-                        </div>
-                        {isDataAcceptable ? this.renderLateDates(lateDates) : this.renderNoLateData()}
-                    </div>
-                </div>
-
-                <div className="divTableCell">
-                    <Button bsStyle="primary" bsSize="sm" onClick={this.showDateModal}>
-                        Add Late Date
-                    </Button>
-                </div>
-
-                <div className="divTableCell">
-                    <Button bsStyle="primary" bsSize="sm" onClick={this.showDepositModal}>
-                        Update Deposit
-                    </Button>
-                </div>
-
-                <div className="divTableCell">
-                    {isDataAcceptable ? this.renderDeleteDatesButton() : <div/>}
-                </div>
+            <Paper style = {{width: '100%', overflowX : 'auto'}} >
+                <Table style = {{minWidth : 700}} >
+                    <TableHead>
+                        <TableRow>
+                            <TableCell style={{width: 50}} ></TableCell>
+                            <TableCell>
+                                <Typography style={{fontSize: 15}}>Dates</Typography>
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                    {data.map(n => {
+                        return (
+                        <TableRow key={n.id} onClick={event => this.handleRowClick(event, n.id)}>
+                            <TableCell padding="checkbox" style={{width: 50}} >
+                                <Checkbox checked={n.isSelected} />
+                            </TableCell>
+                            <TableCell component="th" scope="row">{n.date}</TableCell>
+                        </TableRow>
+                        );
+                    })}
+                    </TableBody>
+                </Table>
+                {this.state.selectedDateNumber > 0 ? this.renderDeleteDateButton() : <div/>}
                 
-                <div className="divTableCell">
-                    {this.renderDateModal()}
-                    {this.renderDepositModal()}
-                    {this.renderDeleteDateModal(isDataAcceptable)}
+                {this.renderAddDateButton()}
 
-                </div>
-            </div>
+            </Paper>
         );
     }
 
     render()
     {
-        var lateDates = [];
-        // isDataAcceptable is used for
-        // when the data has no dates
-        // it is a way to run away from an exception
         var isDataAcceptable = true;
         if(this.props.userData.dates === null || this.props.userData.dates === undefined)
             isDataAcceptable = false;
-    
-        for(var i = 0; isDataAcceptable && i < this.props.userData.dates.length; i++)
-        {
-            lateDates.push(
-                <LateDates 
-                    key = {i}
-                    date = {this.props.userData.dates[i]}/>
-            );
-        }
 
         return(
-            <div className="divTableBody">
-                
-                <div className="divTableRow" style={{background: (this.props.isOdd % 2 === 0 ? '#F5F5F5' : '#EEB2B2')}} >
-                    <div className="divTableCell">
-                        <Button bsStyle = "primary" bsSize = 'sm' onClick = {this.toggleDateTab}>
-                            +
-                        </Button>
-                    </div>
-                    <div className="divTableCell">{this.props.userData.username}</div>
-                    <div className="divTableCell">{this.props.userData.name}</div>
-                    <div className="divTableCell">{this.props.userData.email}</div>
-                    <div className="divTableCell">{this.props.userData.deposit}</div>
-                    <div className="divTableCell">{this.props.userData.usertype}</div>
-                </div>
-                    {this.state.isShowDateTab ? this.renderSubTable(isDataAcceptable, lateDates) : <div></div>}
+            <div style= {{width: '100%'}}>
+                <ExpansionPanel>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography style={{fontSize: 15}}>{this.props.userData.name}</Typography>
+                    </ExpansionPanelSummary>
+                    
+                    <ExpansionPanelDetails>
+                    
+                    <AppBar position="static" color="default">
+                        <Tabs
+                        value={this.state.whichTab}
+                        indicatorColor="secondary"
+                        textColor="secondary"
+                        onChange={this.handleTabChange}
+                        >
+                            <Tab value="details" label="Details" style ={{}} />
+                            <Tab value="dates" label="Dates" />
+                        </Tabs>
+                        {this.state.whichTab === 'details' ? this.renderUserDetails() : this.renderUserDates(isDataAcceptable)}
+                    </AppBar>
+
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+                <Divider light />
             </div>
         );
     }
-}
-
-const LateDates = (props) =>
-{
-    return(
-        <div className="divTableRow" style = {{}} > 
-            <div className="divTableCell">{props.date}</div>
-        </div>
-    );
 }
 
 export default UserItem;

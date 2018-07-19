@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import '../GlobalPages/Home.css';
-import Header from '../GlobalPages/Header';
 import * as Constants from '../GlobalPages/Constants' ;
 import * as BasePage from '../GlobalPages/BasePage';
 import UserItem from './UserItem';
 import 'typeface-roboto';
 import Cookies from "universal-cookie";
+import Header from '../GlobalPages/Header';
 import {
     Modal,
     FormGroup,
@@ -13,6 +13,7 @@ import {
     ControlLabel,
     Button
 } from 'react-bootstrap';
+import { withRouter } from 'react-router';
 
 class AdminHome extends Component
 {
@@ -331,25 +332,16 @@ class AdminHome extends Component
                         key = {i}
                         userData = {this.state.userData[i]}
                         fetchDataAgain = {this.fetchDataAgain.bind(this)}
-                        isOdd = {i}
                     />
                 );
             }
             return(
-                <div className="App">
+                <div>
+                    <Header name = {this.state.groupname}/>
                     
-                    <Header 
-                        history = {this.props.history}
-                        userInfo = {this.state.userInfo}
-                        fetchDataAgain = {this.fetchDataAgain.bind(this)}/>
-
-                    <div style={{marginTop: 20}}/>
+                    <div style={{marginTop: 100}}/>
                     
-                    <div> 
-                        <h1>{this.state.groupname}</h1> 
-                    </div>
-                    
-                    {this.renderTable(renderCassandra)}
+                    {renderCassandra}
               </div>
             );
         }
@@ -357,5 +349,4 @@ class AdminHome extends Component
 }
 
 
-
-export default AdminHome;
+export default withRouter(AdminHome);
