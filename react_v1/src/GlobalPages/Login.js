@@ -101,7 +101,7 @@ class Login extends React.Component {
             }
             catch(e)
             {
-                this.setState({error: e});
+                this.setState({error: e.toString()});
                 console.log('Error on fetching data: ' + e);
             }
         }
@@ -116,7 +116,7 @@ class Login extends React.Component {
     renderLogin()
     {
         return(
-            <div className="Login">
+            <div>
                     <FormGroup controlId="username" bsSize="large">
                         <ControlLabel>Username</ControlLabel>
                         <FormControl

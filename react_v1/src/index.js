@@ -5,6 +5,7 @@ import Login from './GlobalPages/Login';
 import { BrowserRouter,Switch, Route } from 'react-router-dom'
 import AdminHome from './AdminPages/AdminHome';
 import UserHome from './UserPages/UserHome';
+import Profile from './GlobalPages/Profile';
 
 class App extends React.Component { 
     render()
@@ -23,6 +24,7 @@ const Main = () => (
       <Route exact path = '/' component = {Login}/>
       <Route path = '/admin' component = {AdminHome}/>
       <Route path = '/user'  component = {UserHome}/>
+      <Route path = '/profile' component = {Profile}/>
     </Switch>
   </main>
 )

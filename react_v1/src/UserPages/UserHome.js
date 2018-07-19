@@ -155,12 +155,11 @@ class UserHome extends React.Component
 
        
         return(
-            <div className="App">
+            <div>
                 
-                <Header
-                    history = {this.props.history}/>
+                <Header/>
                 
-                <div style={{marginTop: 20}}/>
+                <div style={{marginTop: 60}}/>
                     
                 <div style= {{margin: 20}}>
                     <div className="divTable Table">
