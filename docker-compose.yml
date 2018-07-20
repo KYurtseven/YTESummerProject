@@ -1,0 +1,23 @@
+# version: '3'
+# services: 
+#   db: 
+#     image: cassandra:3
+  
+#   flask:
+#     build: ./src/flask
+#     ports:
+#       - "80:5000"
+#     depends_on:
+#     - db
+flask:
+  build: ./src/flask
+  ports:
+    - "80:5000"
+  links:
+    - cassandra
+cassandra:
+  image: cassandra:3
+npm:
+  build: ./src/react
+  ports:
+    - "3000:3000"

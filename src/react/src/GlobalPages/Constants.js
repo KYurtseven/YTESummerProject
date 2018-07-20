@@ -1,6 +1,6 @@
 export const IS_MOCK = false;
 export const LOCAL_ROOT = 'http://127.0.0.1:5000/';
-export const TEST_ROOT = 'http://0.0.0.0:5000/';
+export const TEST_ROOT = 'http://127.0.0.1/';
 export const PROD_ROOT = 'TODO';
 
 const DeploymentTypeCode = {
@@ -9,7 +9,7 @@ const DeploymentTypeCode = {
     Local:2
 }
 
-const DEPLOYMENT_TYPE = DeploymentTypeCode.Local;
+const DEPLOYMENT_TYPE = DeploymentTypeCode.Test;
 
 export function getRoot(){
     switch(DEPLOYMENT_TYPE)
