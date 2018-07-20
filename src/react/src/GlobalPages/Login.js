@@ -1,9 +1,16 @@
 import React from 'react';
-import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import * as Constants from './Constants';
 import * as BasePage from './BasePage';
-
+import './Home.css';
 import Cookies from "universal-cookie";
+
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 class Login extends React.Component {
     
@@ -113,48 +120,76 @@ class Login extends React.Component {
         return this.state.username.length > 0 && this.state.password.length > 0;
     }
 
-    renderLogin()
+    render()
     {
+        const { classes } = this.props;
+        
+        // TO DO, fix marginTop value
         return(
-            <div>
-                    <FormGroup controlId="username" bsSize="large">
-                        <ControlLabel>Username</ControlLabel>
-                        <FormControl
-                        autoFocus
-                        type="username"
-                        value={this.state.username}
-                        onChange={this.handleUsernameChange}
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="password" bsSize="large">
-                        <ControlLabel>Password</ControlLabel>
-                        <FormControl
-                        value={this.state.password}
-                        onChange={this.handlePasswordChange}
-                        type="password"
-                        />
-                    </FormGroup>
+            <div style = {{display: 'flex', justifyContent: 'center', marginTop: 250}} >
+                <Card className={classes.card}>
+                    <CardContent>
+                        <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                            <TextField
+                                id="username"
+                                label="Username"
+                                type="text"
+                                onChange={this.handleUsernameChange}
+                                style={{flex:1}}
+                                InputLabelProps={{
+                                shrink: true,
+                                }}
+                            />
+                        </form>
+                        <div style={{marginTop:20}}/>
+                        <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                            <TextField
+                                id="password"
+                                label="Password"
+                                type="password"
+                                onChange={this.handlePasswordChange}
+                                style={{flex: 1}}
+                                InputLabelProps={{
+                                shrink: true,
+                                }}
+                            />
+                        </form>
+                    </CardContent>
 
-                    <Button
-                        block
-                        bsSize="large"
-                        disabled={!this.validateForm() || this.state.isPressed}
-                        type="submit"
-                        onClick = {this.handleSubmit}
-                    >
-                        Login
-                    </Button>
-                    <h1>{this.state.error}</h1>
+                    <CardActions style={{float: 'right'}}>
+                        <Button 
+                        onClick={this.handleSubmit}
+                        color="secondary" autoFocus>
+                            Submit
+                        </Button>
+                    </CardActions>
+                </Card> 
             </div>
         );
     }
-    render()
-    {
-
-        return(
-            this.renderLogin()
-        );
-    }
   }
-  
-export default Login;
+const styles = {
+    card: {
+        minWidth: 500,
+        alignSelf : 'flex-end'
+    },
+    bullet: {
+        display: 'inline-block',
+        margin: '0 2px',
+        transform: 'scale(0.8)',
+    },
+    title: {
+        marginBottom: 16,
+        fontSize: 14,
+    },
+    pos: {
+        marginBottom: 12,
+    },
+};
+
+
+Login.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(Login);
