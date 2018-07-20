@@ -12,5 +12,8 @@ COPY package.json /usr/src/app/react/package.json
 RUN npm install --silent
 RUN npm install react-scripts@1.1.1 -g --silent
 
+# copy all the files into to the docker
+COPY . .
+
 # start app
 CMD ["npm", "start"]

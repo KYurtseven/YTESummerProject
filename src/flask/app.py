@@ -1,12 +1,16 @@
+# -*-coding: utf-8 -*-
+import os
+import json
 from flask import request, url_for
 from flask_api import FlaskAPI, status, exceptions
 from cassandra.cluster import Cluster
 from passlib.hash import pbkdf2_sha256
-import json
-cluster = Cluster(['127.0.0.1'])
-session = cluster.connect('yte')
+from initiate_db import init_db
 
 app = FlaskAPI(__name__)
+
+## For connecting the database
+cluster, session = 0, 0
 
 @app.route('/api/admin/addDate', methods = ['POST'])
 def addDate():
@@ -203,5 +207,15 @@ def login(username, password):
 			'error' : str(e)
 		}
 
+@app.route('/api/init', methods = ['GET'])
+def init():
+	global cluster, session
+	cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
+                      port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT', 9042)))
+	session = cluster.connect()
+	init_db(cluster, session)
+	session = cluster.connect('yte')
+	return "The database has been initiated!"
+	
 if __name__ == "__main__":
-    app.run(debug=True)
+	app.run(host='0.0.0.0', port=5000, debug=True)
