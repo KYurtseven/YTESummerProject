@@ -64,7 +64,7 @@ class Header extends React.Component
     {
 
         return (
-            <AppBar /*position="static"*/ style={{backgroundColor: '#ff1744'}} >
+            <AppBar /*position="static"*/ color = 'secondary' >
                 <Toolbar>
                 
                 <Avatar alt="Tübitak logo" src={tubitak_logo} style={{margin:10,marginLeft: -10}} />

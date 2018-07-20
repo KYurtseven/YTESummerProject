@@ -77,7 +77,7 @@ const UpdateDeposit = (props) =>
                         label="New Deposit"
                         type="number"
                         onChange={handleDepositChange}
-                        style={{width: 200}}
+                        style={{flex:1}}
                         InputLabelProps={{
                         shrink: true,
                         }}
