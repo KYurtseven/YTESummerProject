@@ -1,6 +1,6 @@
 export const IS_MOCK = false;
 export const LOCAL_ROOT = 'http://127.0.0.1:5000/';
-export const TEST_ROOT = 'TODO';
+export const TEST_ROOT = 'http://0.0.0.0:5000/';
 export const PROD_ROOT = 'TODO';
 
 const DeploymentTypeCode = {
