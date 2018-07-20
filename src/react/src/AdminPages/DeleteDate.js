@@ -11,7 +11,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
-
+import Badge from '@material-ui/core/Badge';
 
 const DeleteDate = (props) =>
 {
@@ -21,7 +21,7 @@ const DeleteDate = (props) =>
         props.scope.setState({isDeleteDialogShow: true});
     }
 
-    function handleDeleteDateDailogHide()
+    function handleDeleteDateDialogHide()
     {
         props.scope.setState({isDeleteDialogShow: false});
     }
@@ -74,19 +74,25 @@ const DeleteDate = (props) =>
     return(
         <div>
 
-        <Tooltip title="Delete dates">
-            <IconButton 
-                aria-label="Delete" 
-                style={{float: 'right'}}
-                onClick = {handleDeleteDateDialogShow}>
+            <Tooltip title="Delete dates">
+            <Badge 
+                color="secondary" 
+                badgeContent={props.scope.state.selectedDateNumber} style={{float: 'right', marginRight: 20}}>
                 
-                <DeleteIcon />
-            </IconButton>
-        </Tooltip>
+                <IconButton 
+                    aria-label="Delete" 
+                    disabled = {props.disabled}
+                    onClick = {handleDeleteDateDialogShow}>
+                    <DeleteIcon />
+                </IconButton>
+            </Badge>
+            </Tooltip>
+
+        
 
         <Dialog
             open={props.scope.state.isDeleteDialogShow}
-            onClose = {handleDeleteDateDailogHide}
+            onClose = {handleDeleteDateDialogHide}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
             >
@@ -97,10 +103,10 @@ const DeleteDate = (props) =>
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleDeleteDateDailogHide} color="primary">
+                <Button onClick={handleDeleteDateDialogHide} color="secondary">
                     Disagree
                 </Button>
-                <Button onClick={handleDeleteDateSubmit} color="primary" autoFocus>
+                <Button onClick={handleDeleteDateSubmit} color="secondary" autoFocus>
                     Agree
                 </Button>
             </DialogActions>

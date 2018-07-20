@@ -100,10 +100,10 @@ const AddDate = (props) =>
                 </form>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleAddDateDialogHide} color="primary">
+                <Button onClick={handleAddDateDialogHide} color="secondary">
                     Cancel
                 </Button>
-                <Button onClick={handleAddDateSubmit} color="primary" autoFocus>
+                <Button onClick={handleAddDateSubmit} color="secondary" autoFocus>
                     Submit
                 </Button>
             </DialogActions>

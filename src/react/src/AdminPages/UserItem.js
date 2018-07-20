@@ -23,9 +23,13 @@ import AddIcon from '@material-ui/icons/Add';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 
+import TableFooter from '@material-ui/core/TableFooter';
+import TablePagination from '@material-ui/core/TablePagination';
+
 import DeleteDate from './DeleteDate';
 import AddDate from './AddDate';
 import UpdateDeposit from './UpdateDeposit';
+import * as TablePaginationActions from '../GlobalPages/TablePaginationActions';
 
 class UserItem extends Component
 {
@@ -41,12 +45,25 @@ class UserItem extends Component
             isAddDateDialogShow : false,
             isUpdateDepositShow: false,
             dateValue : '',
+            page : 0,
+            rowsPerPage: 5,
         };
 
         this.handleTabChange = this.handleTabChange.bind(this);
         this.handleUpdateDepositShow = this.handleUpdateDepositShow.bind(this);
 
+        this.handleChangePage = this.handleChangePage.bind(this);
+        this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
     }
+
+    handleChangePage = (event, newpage) => {
+        this.setState({page : newpage });
+    };
+
+    handleChangeRowsPerPage = event => {
+    this.setState({ rowsPerPage: event.target.value });
+    };
+    
 
     componentWillMount()
     {
@@ -65,7 +82,7 @@ class UserItem extends Component
         }
         catch(error)
         {
-            //console.log('Error useritem componentwillmount: ' + error);
+            console.log('Error useritem componentwillmount: ' + error);
         }
 
     }
@@ -178,7 +195,10 @@ class UserItem extends Component
             );
         }
         var data = this.state.dates;
-
+        const emptyRows = 
+            this.state.rowsPerPage - 
+            Math.min(this.state.rowsPerPage, data.length -this.state.page * this.state.rowsPerPage);
+ 
         return(
             <Paper style = {{width: '100%', overflowX : 'auto'}} >
                 <Table style = {{minWidth : 700}} >
@@ -191,25 +211,46 @@ class UserItem extends Component
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                    {data.map(n => {
-                        return (
-                        <TableRow key={n.id} onClick={event => this.handleRowClick(event, n.id)}>
-                            <TableCell padding="checkbox" style={{width: 50}} >
-                                <Checkbox checked={n.isSelected} />
-                            </TableCell>
-                            <TableCell component="th" scope="row">{n.date}</TableCell>
-                        </TableRow>
-                        );
-                    })}
+                        {data.slice(
+                                this.state.page * this.state.rowsPerPage, 
+                                this.state.page * this.state.rowsPerPage + this.state.rowsPerPage).map(n => {
+                            return (
+                            <TableRow key={n.id} onClick={event => this.handleRowClick(event, n.id)}>
+                                <TableCell padding="checkbox" style={{width: 50}} >
+                                    <Checkbox checked={n.isSelected} />
+                                </TableCell>
+                                <TableCell component="th" scope="row">{n.date}</TableCell>
+                            </TableRow>
+                            );
+                        })}
+                        {emptyRows > 0 && (
+                            <TableRow style={{ height: 48 * emptyRows }}>
+                            <TableCell colSpan={6} />
+                            </TableRow>
+                        )}
                     </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                            colSpan={3}
+                            count={data.length}
+                            rowsPerPage={this.state.rowsPerPage}
+                            page={this.state.page}
+                            onChangePage={this.handleChangePage}
+                            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                            ActionsComponent={TablePaginationActions.TablePaginationActionsWrapped}
+                            />
+                        </TableRow>
+                    </TableFooter>
+
                 </Table>
-                {this.state.selectedDateNumber > 0 ? 
-                    <DeleteDate
-                        fetchDataAgain = {this.props.fetchDataAgain}
-                        userData = {this.props.userData}
-                        scope = {this}
-                    /> 
-                    : <div/>}
+
+                <DeleteDate
+                    disabled = {this.state.selectedDateNumber <= 0}
+                    fetchDataAgain = {this.props.fetchDataAgain}
+                    userData = {this.props.userData}
+                    scope = {this}
+                /> 
 
                 <AddDate
                     fetchDataAgain = {this.props.fetchDataAgain}
@@ -220,6 +261,21 @@ class UserItem extends Component
         );
     }
     
+/*
+ * OLD BODY
+<TableBody>
+    {data.map(n => {
+        return (
+        <TableRow key={n.id} onClick={event => this.handleRowClick(event, n.id)}>
+            <TableCell padding="checkbox" style={{width: 50}} >
+                <Checkbox checked={n.isSelected} />
+            </TableCell>
+            <TableCell component="th" scope="row">{n.date}</TableCell>
+        </TableRow>
+        );
+    })}
+</TableBody>
+*/
     render()
     {
         var isDataAcceptable = true;
@@ -251,9 +307,11 @@ class UserItem extends Component
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <Divider light />
+                
             </div>
         );
     }
 }
+
 
 export default UserItem;

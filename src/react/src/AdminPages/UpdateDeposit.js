@@ -85,10 +85,10 @@ const UpdateDeposit = (props) =>
                 </form>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleUpdateDepositHide} color="primary">
+                <Button onClick={handleUpdateDepositHide} color="secondary">
                     Cancel
                 </Button>
-                <Button onClick={handleDepositSubmit} color="primary" autoFocus>
+                <Button onClick={handleDepositSubmit} color="secondary" autoFocus>
                     Submit
                 </Button>
             </DialogActions>
