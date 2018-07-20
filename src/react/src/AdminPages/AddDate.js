@@ -92,7 +92,7 @@ const AddDate = (props) =>
                         label="New Date"
                         type="date"
                         onChange={handleDateChange}
-                        style={{width: 200}}
+                        style={{flex:1}}
                         InputLabelProps={{
                         shrink: true,
                         }}

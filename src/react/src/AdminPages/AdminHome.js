@@ -146,7 +146,7 @@ class AdminHome extends Component
                         color="secondary" 
                         size="small" 
                         aria-label="Add"
-                        style={{float:'right', marginTop: 20, marginRight: 20}}
+                        style={{float:'right', marginTop: 20, marginRight: 20, marginBottom:20}}
                         onClick = {this.showAddUserDialog}
                         >
                         
