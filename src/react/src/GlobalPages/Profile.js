@@ -12,7 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import SaveIcon from '@material-ui/icons/Save';
 import { withRouter } from 'react-router';
 import PropTypes from 'prop-types';
-
+import Header from './Header';
 class Profile extends React.Component
 {  
     static propTypes = {
@@ -84,7 +84,9 @@ class Profile extends React.Component
     render()
     {
         return(
-            <div style={{width: '100%'}}>
+        <div style = {{marginTop: 100}} >
+            
+            <Header name = {'TÜBİTAK'}/>
             <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>Change Email</Typography>
@@ -109,7 +111,7 @@ class Profile extends React.Component
                     </Button>
                 </ExpansionPanelDetails>
             </ExpansionPanel>
-            </div>
+        </div>
         );
     }
 }

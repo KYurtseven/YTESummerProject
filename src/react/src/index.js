@@ -6,13 +6,28 @@ import { BrowserRouter,Switch, Route } from 'react-router-dom'
 import AdminHome from './AdminPages/AdminHome';
 import UserHome from './UserPages/UserHome';
 import Profile from './GlobalPages/Profile';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#E91E63', //pink500
+    },
+    secondary: {
+      main: '#E91E63', //pink500
+      // dark: will be calculated from palette.secondary.main,
+    },
+  },
+});
 
 class App extends React.Component { 
     render()
     {
       return(
         <div>
-          <Main />
+          <MuiThemeProvider theme={theme}>
+            <Main />
+          </MuiThemeProvider>
         </div>
     );
     }
