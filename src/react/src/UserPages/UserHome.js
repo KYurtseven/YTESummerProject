@@ -1,13 +1,28 @@
 import React from 'react';
 import * as Constants from '../GlobalPages/Constants';
 import * as BasePage from '../GlobalPages/BasePage';
-import Header from '../GlobalPages/Header';
 import '../GlobalPages/Home.css';
+import Header from '../GlobalPages/Header';
 import Cookies from "universal-cookie";
-import {
-    Button,
-} from 'react-bootstrap';
 
+import AppBar from '@material-ui/core/AppBar';
+import Typography from '@material-ui/core/Typography';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Divider from '@material-ui/core/Divider';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import TableFooter from '@material-ui/core/TableFooter';
+import TablePagination from '@material-ui/core/TablePagination';
+import Card from '@material-ui/core/Card';
+import * as TablePaginationActions from '../GlobalPages/TablePaginationActions';
 
 class UserHome extends React.Component
 {   
@@ -22,11 +37,23 @@ class UserHome extends React.Component
             userData : {}, // api response
             userInfo : {}, // cookie
             error: '',
-            isShowDateTab: false,
+            whichTab : 'details',
+            page : 0,
+            rowsPerPage: 5,
         }
+        this.handleChangePage = this.handleChangePage.bind(this);
+        this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
+        this.handleTabChange = this.handleTabChange.bind(this);
 
-        this.toggleDateTab = this.toggleDateTab.bind(this);
     }
+
+    handleChangePage = (event, newpage) => {
+        this.setState({page : newpage });
+    };
+
+    handleChangeRowsPerPage = event => {
+    this.setState({ rowsPerPage: event.target.value });
+    };
 
     async componentDidMount()
     {
@@ -76,52 +103,9 @@ class UserHome extends React.Component
         }
     }
 
-    toggleDateTab()
-    {
-        this.setState({isShowDateTab: !this.state.isShowDateTab});
-    }
-
-    renderNoLateData()
-    {
-        return(
-            <div>
-                <p className= "User-text-right">No Late Data</p>
-            </div>
-        );
-    }
-
-    renderLateDates(lateDates)
-    {
-        return(
-            <div className="divTableBody">
-                {lateDates}
-            </div>
-        );
-    }
-
-    renderSubTable(isDataAcceptable, lateDates)
-    {
-        return(
-            <div className="divTableRow" style={{backgroundColor : 'white'}} >
-                <div className="divTableCell"></div>
-                <div className="divTableCell">
-
-                    <div className="divTable Table" >
-                        <div className="divTableHeading">
-                            <div className="divTableRow">
-                                <div className="divTableHead">Dates</div>
-                            </div>
-                        </div>
-                        {isDataAcceptable ? this.renderLateDates(lateDates) : this.renderNoLateData()}
-                    </div>
-                </div>
-                <div className="divTableCell"></div>
-                <div className="divTableCell"></div>
-                <div className="divTableCell"></div>
-                <div className="divTableCell"></div>
-            </div>
-        );
-    }
+    handleTabChange = (event, value) => {
+        this.setState({whichTab: value });
+    };
 
     renderIsLoading()
     {
@@ -132,79 +116,152 @@ class UserHome extends React.Component
             );
     }
 
+    renderUserDetails()
+    {
+        return(
+            <List component="nav">
+                <ListItem>
+                    <ListItemText 
+                        primary = 'Username'
+                        secondary = {this.state.userData.username} />
+                </ListItem>
+                
+                <Divider/>
+                
+                <ListItem>
+                    <ListItemText 
+                        primary = "Email" 
+                        secondary = {this.state.userData.email}/>
+                </ListItem>
+                
+                <Divider/>
+
+                <ListItem>
+                    <ListItemText 
+                        primary = "Deposit"
+                        secondary = {this.state.userData.deposit} />
+                </ListItem>
+                
+                <Divider/>
+                
+                <ListItem >
+                    <ListItemText 
+                        primary = "User Type"
+                        secondary = {this.state.userData.usertype} />
+                </ListItem>
+            </List>
+        );
+    }
+
+    renderUserDates(isDataAcceptable)
+    {
+        if(!isDataAcceptable)
+        {
+            return(
+                <Paper style = {{width: '100%', overflowX : 'auto'}} >
+                    <Typography style={{fontSize: 15}}>No Late Data</Typography>
+                </Paper>
+
+            );
+        }
+        var data = [];
+        for(var i = 0; i < this.state.userData.dates.length; i++)
+        {
+            let dataitem = {};
+            dataitem.id = i;
+            dataitem.date = this.state.userData.dates[i];
+            data.push(dataitem);
+        }
+        const emptyRows = 
+            this.state.rowsPerPage - 
+            Math.min(this.state.rowsPerPage, data.length -this.state.page * this.state.rowsPerPage);
+ 
+        return(
+            <Paper style = {{width: '100%', overflowX : 'auto'}} >
+                <Table style = {{minWidth : 700}} >
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>
+                                <Typography style={{fontSize: 15}}>Dates</Typography>
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data.slice(
+                                this.state.page * this.state.rowsPerPage, 
+                                this.state.page * this.state.rowsPerPage + this.state.rowsPerPage).map(n => {
+                            return (
+                            <TableRow key={n.id}>
+                                <TableCell component="th" scope="row">{n.date}</TableCell>
+                            </TableRow>
+                            );
+                        })}
+                        {emptyRows > 0 && (
+                            <TableRow style={{ height: 48 * emptyRows }}>
+                            <TableCell colSpan={6} />
+                            </TableRow>
+                        )}
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                            colSpan={3}
+                            count={data.length}
+                            rowsPerPage={this.state.rowsPerPage}
+                            page={this.state.page}
+                            onChangePage={this.handleChangePage}
+                            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                            ActionsComponent={TablePaginationActions.TablePaginationActionsWrapped}
+                            />
+                        </TableRow>
+                    </TableFooter>
+
+                </Table>        
+            </Paper>
+        );
+    }
+
     render()
     {
         if(this.state.isLoading)
             return (this.renderIsLoading());
-        var lateDates = [];
         // isDataAcceptable is used for
         // when the data has no dates
         // it is a way to run away from an exception
         var isDataAcceptable = true;
         if(this.state.userData.dates === null || this.state.userData.dates === undefined)
             isDataAcceptable = false;
-    
-        for(var i = 0; isDataAcceptable && i < this.state.userData.dates.length; i++)
-        {
-            lateDates.push(
-                <LateDates 
-                    key = {i}
-                    date = {this.state.userData.dates[i]}/>
-            );
-        }
 
-       
         return(
-            <div>
+            <div style= {{width: '100%'}}>
+                <Header name = {'TÜBİTAK'}/>
                 
-                <Header/>
-                
-                <div style={{marginTop: 60}}/>
+                <div style={{marginTop: 100}}/>
+
+                <Card style={{minWidth:500}} >
+                    <Typography style={{marginLeft:12, marginTop:16, marginBottom: 16, fontSize: 20}}>
+                        {this.state.userData.name}
+                    </Typography>
                     
-                <div style= {{margin: 20}}>
-                    <div className="divTable Table">
-                        <div className="divTableHeading">
-                            <div className="divTableRow">
-                                <div className="divTableHead" style={{width: 50}} ></div>
-                                <div className="divTableHead">User name</div>
-                                <div className="divTableHead">Name</div>
-                                <div className="divTableHead">E-mail</div>
-                                <div className="divTableHead" style = {{width:100}} >Deposit</div>
-                                <div className="divTableHead">User type</div>
-                            </div>
-                        </div>
-                            
-                        <div className="divTableBody">
-                
-                            <div className="divTableRow" style={{background: ('#F5F5F5')}} >
-                                <div className="divTableCell">
-                                    <Button bsStyle = "primary" bsSize = 'sm' onClick = {this.toggleDateTab}>
-                                        +
-                                    </Button>
-                                </div>
-                                <div className="divTableCell">{this.state.userData.username}</div>
-                                <div className="divTableCell">{this.state.userData.name}</div>
-                                <div className="divTableCell">{this.state.userData.email}</div>
-                                <div className="divTableCell">{this.state.userData.deposit}</div>
-                                <div className="divTableCell">{this.state.userData.usertype}</div>
-                            </div>
-                                {this.state.isShowDateTab ? this.renderSubTable(isDataAcceptable, lateDates) : <div></div>}
-                        </div>
-                    
-                    </div>
-                </div>
+       
+                    <AppBar position="static" color="default">
+                        <Tabs
+                        value={this.state.whichTab}
+                        indicatorColor="secondary"
+                        textColor="secondary"
+                        onChange={this.handleTabChange}
+                        >
+                            <Tab value="details" label="Details" style ={{}} />
+                            <Tab value="dates" label="Dates" />
+                        </Tabs>
+                        {this.state.whichTab === 'details' ? this.renderUserDetails() : this.renderUserDates(isDataAcceptable)}
+                    </AppBar>
+
+                </Card>
             </div>
         );
+        
     }
-}
-
-const LateDates = (props) =>
-{
-    return(
-        <div className="divTableRow" style = {{}} > 
-            <div className="divTableCell">{props.date}</div>
-        </div>
-    );
 }
 
 export default UserHome;

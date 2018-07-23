@@ -184,7 +184,7 @@ class UserItem extends Component
         {
             return(
                 <Paper style = {{width: '100%', overflowX : 'auto'}} >
-                    <Typography style={{fontSize: 15}}>No Late Data</Typography>
+                    <Typography style={{marginLeft:12, marginTop:16, fontSize: 15}}>No Late Data</Typography>
                     <AddDate
                         fetchDataAgain = {this.props.fetchDataAgain}
                         userData = {this.props.userData}
