@@ -9,11 +9,8 @@ import Header from '../GlobalPages/Header';
 
 import { withRouter } from 'react-router';
 
-import AddIcon from '@material-ui/icons/Add';
-import Button from '@material-ui/core/Button';
-
 import AddUser from './AddUser';
-
+import AddDateForMultiUser from './AddDateForMultiUser';
 class AdminHome extends Component
 {
     constructor(props)
@@ -28,6 +25,11 @@ class AdminHome extends Component
             groupname: '',
             isShowUserDialog: false,
 
+            // states for adding date to multiple users
+            isShowMultiDateDialog: false,
+            dateValueForMultiUser: '',
+            userDataForMultiDate: {},
+            
             // newuser
             newUserEmail: '',
             newUserUsername : '',
@@ -36,8 +38,6 @@ class AdminHome extends Component
 
             error: ''
         }
-
-        this.showAddUserDialog = this.showAddUserDialog.bind(this);
    }
 
     sortByKey(array, key)
@@ -46,6 +46,23 @@ class AdminHome extends Component
             var x = a[key].toLowerCase(); var y = b[key].toLowerCase();
             return((x < y) ? -1: ((x > y) ? 1 : 0));
         });
+    }
+
+
+    prepareDataForAddDateForMultiUser()
+    {
+        // FOR ADD DATE FOR MULTI USER
+        var data = []
+        for(var i = 0; i < this.state.userData.length; i++)
+        {
+            let tmpval = {};
+            tmpval.username = this.state.userData[i].username;
+            tmpval.name = this.state.userData[i].name;
+            tmpval.isSelected = false;
+            tmpval.id = i;
+            data.push(tmpval);
+        }
+        this.setState({userDataForMultiDate : data});
     }
 
     async componentDidMount()
@@ -75,9 +92,11 @@ class AdminHome extends Component
                         let restext = await res.text();
                         let resJSON = JSON.parse(restext);
                         
-                        let users = resJSON.users;
+                        let users = resJSON.users; 
                         users = this.sortByKey(users, 'name');
                         this.setState({userData: users, groupname: resJSON.groupname, isLoading: false});
+
+                        this.prepareDataForAddDateForMultiUser();
                     }
                     else
                         throw(Constants.getNot200);
@@ -111,9 +130,29 @@ class AdminHome extends Component
             );
     }
 
-    showAddUserDialog()
+    handleRowClickForAddDateForMultiUser(event ,id)
     {
-        this.setState({isShowUserDialog: true});
+        let tmp = this.state.userDataForMultiDate;
+        let selectedIndex;
+        for(var i = 0; i < this.state.userDataForMultiDate.length; i++)
+        {
+            if(id === tmp[i].id)
+            {
+                selectedIndex = i;
+                break;
+            }
+        }
+        
+        if(tmp[selectedIndex].isSelected)
+        {
+            tmp[selectedIndex].isSelected =false;
+        }
+        else
+        {
+            tmp[selectedIndex].isSelected = true;
+        }
+        
+        this.setState({ userDataForMultiDate: tmp});
     }
 
     render()
@@ -141,25 +180,18 @@ class AdminHome extends Component
                     
                     {renderCassandra}
                     
-                    <Button 
-                        variant="fab" 
-                        color="secondary" 
-                        size="small" 
-                        aria-label="Add"
-                        style={{float:'right', marginTop: 20, marginRight: 20, marginBottom:20}}
-                        onClick = {this.showAddUserDialog}
-                        >
-                        
-                        <AddIcon />
-                    </Button>
-                    {this.state.isShowUserDialog ? 
-                        <AddUser
-                            scope = {this}
-                            fetchDataAgain = {this.fetchDataAgain}  
-                        />
-                        : 
-                        <div/>
-                    }
+                    <AddUser
+                        scope = {this}
+                        fetchDataAgain = {this.fetchDataAgain.bind(this)}  
+                    />
+
+                    <AddDateForMultiUser
+                        scope = {this}
+                        userData = {this.state.userDataForMultiDate}
+                        handleRowClick = {this.handleRowClickForAddDateForMultiUser.bind(this)}
+                        fetchDataAgain = {this.fetchDataAgain.bind(this)}
+
+                    />
               </div>
             );
         }

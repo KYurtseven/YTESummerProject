@@ -9,7 +9,7 @@ const DeploymentTypeCode = {
     Local:2
 }
 
-const DEPLOYMENT_TYPE = DeploymentTypeCode.Test;
+const DEPLOYMENT_TYPE = DeploymentTypeCode.Local;
 
 export function getRoot(){
     switch(DEPLOYMENT_TYPE)
@@ -35,10 +35,11 @@ export const changeEmail    = 'api/general/updateEmail';
 
 // ADMIN API'S
 export const adminFetch     = 'api/admin/fetch/';
-export const addDate        = 'api/admin/addDate';
+export const addDate        = 'api/admin/addDateForSingleUser';
 export const updateDeposit  = 'api/admin/updateDeposit';
 export const deleteDates    = 'api/admin/deleteDates';
 export const addUser        = 'api/admin/addUser';
+export const addDateToMultiUser = 'api/admin/addDateForMultiUser';
 
 // USER API'S
 export const userFetch      = 'api/user/fetch/';

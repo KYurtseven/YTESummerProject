@@ -69,6 +69,7 @@ class UserItem extends Component
     {
         try
         {
+            // FOR USERITEM
             var myarr = []
             for(var i = 0; i < this.props.userData.dates.length; i++)
             {
@@ -87,7 +88,7 @@ class UserItem extends Component
 
     }
 
-    handleRowClick = (event, id) => {
+    handleRowClick (event, id){
         let tmp = this.state.dates;
         let oldNumber = this.state.selectedDateNumber;
 
@@ -260,22 +261,7 @@ class UserItem extends Component
             </Paper>
         );
     }
-    
-/*
- * OLD BODY
-<TableBody>
-    {data.map(n => {
-        return (
-        <TableRow key={n.id} onClick={event => this.handleRowClick(event, n.id)}>
-            <TableCell padding="checkbox" style={{width: 50}} >
-                <Checkbox checked={n.isSelected} />
-            </TableCell>
-            <TableCell component="th" scope="row">{n.date}</TableCell>
-        </TableRow>
-        );
-    })}
-</TableBody>
-*/
+
     render()
     {
         var isDataAcceptable = true;
