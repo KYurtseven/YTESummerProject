@@ -3,6 +3,7 @@ import * as Constants from '../GlobalPages/Constants' ;
 import * as BasePage from '../GlobalPages/BasePage';
 
 
+import AddIcon from '@material-ui/icons/Add';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -103,86 +104,113 @@ const AddUser = (props) =>
         }
     }
 
+    function showAddUserDialog()
+    {
+        props.scope.setState({isShowUserDialog: true});
+    }
+
+    function renderDialog()
+    {
+        return(
+            <Dialog
+            open={props.scope.state.isShowUserDialog}
+            onClose = {hideDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            >
+            <DialogTitle id="alert-dialog-title">{"Add user"}</DialogTitle>
+            <DialogContent>
+                <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                    <TextField
+                        id="username"
+                        label="Username"
+                        type="text"
+                        onChange={handleUsernameChange}
+                        style={{width: 200}}
+                        InputLabelProps={{
+                        shrink: true,
+                        }}
+                    />
+                </form>
+
+                <Divider light />
+
+                <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                    <TextField
+                        id="email"
+                        label="Email"
+                        type="email"
+                        onChange={handleEmailChange}
+                        style={{width: 200}}
+                        InputLabelProps={{
+                        shrink: true,
+                        }}
+                    />
+                </form>
+
+                <Divider light />
+                
+                <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                    <TextField
+                        id="password"
+                        label="Password"
+                        type="password"
+                        onChange={handlePasswordChange}
+                        style={{width: 200}}
+                        InputLabelProps={{
+                        shrink: true,
+                        }}
+                    />
+                </form>
+                
+                <Divider light />
+
+                <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                    <TextField
+                        id="name"
+                        label="Name"
+                        type="text"
+                        onChange={handleNameChange}
+                        style={{width: 200}}
+                        InputLabelProps={{
+                        shrink: true,
+                        }}
+                    />
+                </form>
+
+            </DialogContent>
+                <DialogActions>
+                    <Button onClick={hideDialog} color="secondary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleAddUserSubmit} color="secondary" autoFocus>
+                        Submit
+                    </Button>
+                </DialogActions>
+                {props.scope.state.error}
+            </Dialog>
+        );
+    }
+
     return(
-        <Dialog
-        open={props.scope.state.isShowUserDialog}
-        onClose = {hideDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        >
-        <DialogTitle id="alert-dialog-title">{"Add user"}</DialogTitle>
-        <DialogContent>
-            <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
-                <TextField
-                    id="username"
-                    label="Username"
-                    type="text"
-                    onChange={handleUsernameChange}
-                    style={{width: 200}}
-                    InputLabelProps={{
-                    shrink: true,
-                    }}
-                />
-            </form>
-
-            <Divider light />
-
-            <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
-                <TextField
-                    id="email"
-                    label="Email"
-                    type="email"
-                    onChange={handleEmailChange}
-                    style={{width: 200}}
-                    InputLabelProps={{
-                    shrink: true,
-                    }}
-                />
-            </form>
-
-            <Divider light />
-            
-            <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
-                <TextField
-                    id="password"
-                    label="Password"
-                    type="password"
-                    onChange={handlePasswordChange}
-                    style={{width: 200}}
-                    InputLabelProps={{
-                    shrink: true,
-                    }}
-                />
-            </form>
-            
-            <Divider light />
-
-            <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
-                <TextField
-                    id="name"
-                    label="Name"
-                    type="text"
-                    onChange={handleNameChange}
-                    style={{width: 200}}
-                    InputLabelProps={{
-                    shrink: true,
-                    }}
-                />
-            </form>
-
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={hideDialog} color="secondary">
-                Cancel
+        <div>
+            <Button 
+                variant="fab" 
+                color="secondary" 
+                size="small" 
+                aria-label="Add"
+                style={{float:'right', marginTop: 20, marginRight: 20, marginBottom:20}}
+                onClick = {showAddUserDialog}
+                >
+                <AddIcon />
             </Button>
-            <Button onClick={handleAddUserSubmit} color="secondary" autoFocus>
-                Submit
-            </Button>
-        </DialogActions>
-        {props.scope.state.error}
-    </Dialog>
-
-    );
+            {props.scope.state.isShowUserDialog ? 
+                renderDialog()
+                : 
+                <div/>
+            }
+        </div>
+    );   
 }
 
 export default AddUser;

@@ -11,18 +11,58 @@ app = FlaskAPI(__name__)
 
 ## For connecting the database
 cluster, session = 0, 0
+# FOR NOW, DELETE WHEN DEPLOYMENT
+cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
+                      port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT', 9042)))
+session = cluster.connect('yte')
 
-@app.route('/api/admin/addDate', methods = ['POST'])
-def addDate():
+
+@app.route('/api/admin/addDateForSingleUser', methods = ['POST'])
+def addDateForSingleUser():
 	username = request.get_json(force=True).get('username')
 	date = request.get_json(force=True).get('date')
 
-	query = "UPDATE YTE.LATE SET dates = dates + ['" + date + "'] WHERE username = '" + username + "'"
-	session.execute(query)
+	queryDeposit = "SELECT deposit from YTE.LATE " + \
+			" WHERE username = '" + username + "'"
 	
-	# TO DO, delete ret and return
-	ret = {'username': username, 'date': date}
-	return ret
+	deposit = 0
+	depositResult = session.execute(queryDeposit)
+	
+	for rows in depositResult:
+		deposit = rows.deposit
+	# update deposit
+	deposit = deposit - 5
+
+	query = "UPDATE YTE.LATE SET dates = dates + ['" + date + "'], " + \
+			" deposit = " + str(deposit) + " WHERE username = '" + username + "'" 
+	
+	session.execute(query)
+	return {}
+
+@app.route('/api/admin/addDateForMultiUser', methods = ['POST'])
+def addDateForMultiUser():
+
+	usernames = request.get_json(force=True).get('usernames')
+	date = request.get_json(force=True).get('date')
+	for user in usernames:
+
+		queryDeposit = "SELECT deposit from YTE.LATE " + \
+			" WHERE username = '" + user + "'"
+	
+		deposit = 0
+		depositResult = session.execute(queryDeposit)
+		
+		for rows in depositResult:
+			deposit = rows.deposit
+
+		# update deposit
+		deposit = deposit - 5
+		
+		query = "UPDATE YTE.LATE SET dates = dates + ['" + date + "'], " + \
+			" deposit = " + str(deposit) + " WHERE username = '" + user + "'" 
+	
+		session.execute(query)	
+	return {}
 
 @app.route('/api/admin/updateDeposit', methods = ['POST'])
 def updateDeposit():
@@ -34,9 +74,8 @@ def updateDeposit():
 
 	print("QUERY", query)
 	session.execute(query)
-	# TO DO, delete ret and return
-	ret = {'username' : username, 'deposit' : deposit}
-	return ret
+
+	return {}
 
 @app.route('/api/admin/deleteDates', methods = ['POST'])
 def deleteDates():
@@ -51,8 +90,7 @@ def deleteDates():
 
 	session.execute(query)
 
-	#TO DO
-	return {'name' : 'hi'}
+	return {}
 
 @app.route('/api/general/updateEmail', methods = ['POST'])
 def updateEmail():
