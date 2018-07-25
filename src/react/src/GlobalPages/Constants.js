@@ -32,6 +32,7 @@ export const postNot200 = 'POST Response status is not 200';
 // API'S
 export const login          = 'api/login/';
 export const changeEmail    = 'api/general/updateEmail';
+export const changePassword = 'api/general/changePassword';
 
 // ADMIN API'S
 export const adminFetch     = 'api/admin/fetch/';
