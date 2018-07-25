@@ -12,7 +12,7 @@
 flask:
   build: ./src/flask
   ports:
-    - "80:5000"
+    - "5000:5000"
   links:
     - cassandra
 cassandra:
@@ -20,4 +20,4 @@ cassandra:
 npm:
   build: ./src/react
   ports:
-    - "3000:3000"
+    - "80:3000"
