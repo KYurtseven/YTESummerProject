@@ -22,3 +22,4 @@ six==1.11.0
 Werkzeug==0.14.1
 wheel==0.31.1
 wrapt==1.10.11
+Flask-Cors==3.0.6

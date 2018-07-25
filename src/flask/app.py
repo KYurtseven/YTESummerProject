@@ -6,8 +6,10 @@ from flask_api import FlaskAPI, status, exceptions
 from cassandra.cluster import Cluster
 from passlib.hash import pbkdf2_sha256
 from initiate_db import init_db
+from flask_cors import CORS
 
 app = FlaskAPI(__name__)
+CORS(app)
 ## For connecting the database
 cluster, c_session = 0, 0
 
