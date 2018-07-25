@@ -27,12 +27,15 @@ class Profile extends React.Component
         this.state = 
         {
             userInfo : {},
-            newEmail : ''
+            newEmail : '',
+            newPassword: ''
         }
         
         this.handleChangeMailSubmit = this.handleChangeMailSubmit.bind(this);
         this.handleChangeMailChange = this.handleChangeMailChange.bind(this);
 
+        this.handlePasswordChange = this.handlePasswordChange.bind(this);
+        this.handlePasswordSubmit = this.handlePasswordSubmit.bind(this);
     }
 
     componentWillMount()
@@ -81,12 +84,9 @@ class Profile extends React.Component
         }
     }
 
-    render()
+    renderEmail()
     {
         return(
-        <div style = {{marginTop: 100}} >
-            
-            <Header name = {'TÜBİTAK'}/>
             <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>Change Email</Typography>
@@ -111,6 +111,86 @@ class Profile extends React.Component
                     </Button>
                 </ExpansionPanelDetails>
             </ExpansionPanel>
+
+        );
+    }
+
+    handlePasswordChange(event)
+    {
+        this.setState({newPassword : event.target.value});
+    }
+
+    async handlePasswordSubmit()
+    {
+        var url;
+        url = Constants.getRoot() + Constants.changePassword;
+
+        let body = JSON.stringify({
+            username : this.state.userInfo.username,
+            password : this.state.newPassword
+        });
+        
+        try
+        {
+            let res = await BasePage.CallApiPost(url, body);
+            if(res.status === 200)
+            {
+                this.props.history.goBack();
+            }
+            else
+                throw(Constants.postNot200);
+        }
+        catch(e)
+        {
+            this.setState({error: e});
+            console.log('Error on change password submit' + this.state.error);
+        }
+    }
+
+    renderPassword()
+    {
+        return(
+            <ExpansionPanel>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Change Password</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails style={{display: 'table', width: '100%'}} >
+                    <TextField
+                        id="password"
+                        label="password"
+                        type="password"
+                        style={{width: '100%'}}
+                        value={this.state.newPassword}
+                        onChange={this.handlePasswordChange}
+                        margin="normal"
+                    />
+                    <Button 
+                        variant="contained" 
+                        size="small"  
+                        style={{float: 'right', marginRight: 40}}
+                        onClick = {this.handlePasswordSubmit}
+                    >
+                        <SaveIcon style = {{fontSize: 12}} />
+                        Save
+                    </Button>
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        );
+    }
+
+    render()
+    {
+        return(
+        <div style = {{marginTop: 100}} >
+            
+            <Header name = {'TÜBİTAK'}/>
+            
+            {this.renderEmail()}
+
+            {this.renderPassword()}
+
+            
+
         </div>
         );
     }

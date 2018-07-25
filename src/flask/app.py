@@ -1,20 +1,20 @@
 # -*-coding: utf-8 -*-
 import os
 import json
-from flask import request, url_for
+from flask import session, redirect, url_for, escape, request
 from flask_api import FlaskAPI, status, exceptions
 from cassandra.cluster import Cluster
 from passlib.hash import pbkdf2_sha256
 from initiate_db import init_db
 
 app = FlaskAPI(__name__)
-
 ## For connecting the database
-cluster, session = 0, 0
+cluster, c_session = 0, 0
+
 # FOR NOW, DELETE WHEN DEPLOYMENT
-cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
-                      port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT', 9042)))
-session = cluster.connect('yte')
+#cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
+#                      port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT', 9042)))
+#c_session = cluster.connect('yte')
 
 
 @app.route('/api/admin/addDateForSingleUser', methods = ['POST'])
@@ -26,7 +26,7 @@ def addDateForSingleUser():
 			" WHERE username = '" + username + "'"
 	
 	deposit = 0
-	depositResult = session.execute(queryDeposit)
+	depositResult = c_session.execute(queryDeposit)
 	
 	for rows in depositResult:
 		deposit = rows.deposit
@@ -36,7 +36,7 @@ def addDateForSingleUser():
 	query = "UPDATE YTE.LATE SET dates = dates + ['" + date + "'], " + \
 			" deposit = " + str(deposit) + " WHERE username = '" + username + "'" 
 	
-	session.execute(query)
+	c_session.execute(query)
 	return {}
 
 @app.route('/api/admin/addDateForMultiUser', methods = ['POST'])
@@ -50,7 +50,7 @@ def addDateForMultiUser():
 			" WHERE username = '" + user + "'"
 	
 		deposit = 0
-		depositResult = session.execute(queryDeposit)
+		depositResult = c_session.execute(queryDeposit)
 		
 		for rows in depositResult:
 			deposit = rows.deposit
@@ -61,7 +61,7 @@ def addDateForMultiUser():
 		query = "UPDATE YTE.LATE SET dates = dates + ['" + date + "'], " + \
 			" deposit = " + str(deposit) + " WHERE username = '" + user + "'" 
 	
-		session.execute(query)	
+		c_session.execute(query)	
 	return {}
 
 @app.route('/api/admin/updateDeposit', methods = ['POST'])
@@ -73,7 +73,7 @@ def updateDeposit():
 	query = "UPDATE YTE.LATE SET deposit = " + deposit + " WHERE username = '" + username + "'"
 
 	print("QUERY", query)
-	session.execute(query)
+	c_session.execute(query)
 
 	return {}
 
@@ -88,7 +88,7 @@ def deleteDates():
 	query = "UPDATE YTE.LATE SET dates = " + str(dates) + " WHERE username = '" + username + "'"
 	print('QUERY', query)
 
-	session.execute(query)
+	c_session.execute(query)
 
 	return {}
 
@@ -101,13 +101,28 @@ def updateEmail():
 
 	try:
 		# now, we know the usertype, groupid
-		session.execute(query)
+		c_session.execute(query)
 	except Exception as e:
 		return{
 			'error' : str(e)
 		}
-	#TO DO
-	return {'name' : 'hi'}
+	
+	return {}
+
+@app.route('/api/general/changePassword', methods =['POST'])
+def changePassword():
+	print('session password' , session)
+	username = request.get_json(force=True).get('username')
+	newpassword = request.get_json(force=True).get('password')
+
+	hashpassword = pbkdf2_sha256.hash(newpassword)
+
+	query = "UPDATE EMPLOYEE SET password = '" + hashpassword + "' " + \
+			" WHERE username = '" + username + "'"
+
+	c_session.execute(query)
+
+	return {}
 
 @app.route('/api/admin/addUser', methods = ['POST'])
 def addUser():
@@ -122,7 +137,7 @@ def addUser():
 	queryCheck = "SELECT username from YTE.EMPLOYEE where username = '" + username + "'"
 
 	try:
-		a = session.execute(queryCheck)
+		a = c_session.execute(queryCheck)
 		for row in a:
 			raise Exception('Username ' + username + ' exists')
 	except Exception as e:
@@ -136,32 +151,28 @@ def addUser():
 						" VALUES('" + username + "', '" + hashpassword + "'" + \
 						", '" + usertype + "')"
 	
-	session.execute(queryAddEmployee)
+	c_session.execute(queryAddEmployee)
 
 	# now create late data for that employee
 	deposit = 50
 	queryAddLate =  "INSERT INTO YTE.LATE (username, deposit, email, name, usertype) " +\
 					" VALUES ('" + username + "', " + str(deposit) + ", '" + email + "'" +\
 					", '" + name + "', '" + usertype + "')"
-	session.execute(queryAddLate)
+	c_session.execute(queryAddLate)
 
 	# now add this user to the admin's group
 	
 	queryAddGroup = "UPDATE YTE.GROUP SET users = users + ['" + username + "'] WHERE groupid = " + str(groupid)
-	session.execute(queryAddGroup)
+	c_session.execute(queryAddGroup)
 
-	# TO DO
-	return {
-		'name' : 'hi',
-		'error' : ''
-	}
+	return {'error' : ''}
 
 @app.route('/api/admin/fetch/<int:groupid>', methods = ['GET'])
 def fetchAdminData(groupid):
 	# first fetch users in the same group
 	query = "SELECT json users, groupname FROM GROUP where groupid = " + str(groupid)
 
-	queryResult = session.execute(query)
+	queryResult = c_session.execute(query)
 
 	userlist = []
 	
@@ -180,7 +191,7 @@ def fetchAdminData(groupid):
 	userlist = str(userlist).replace(']', ')')
 
 	query2 = "SELECT json * FROM LATE where username in " + str(userlist)
-	queryResult2 = session.execute(query2)
+	queryResult2 = c_session.execute(query2)
 
 	users = []
 	for rows in queryResult2:
@@ -206,7 +217,7 @@ def fetchUserData(username):
 	query = "SELECT json * FROM LATE where username = '" + username + "'"
 
 	print("user query", query) 
-	queryResult = session.execute(query)
+	queryResult = c_session.execute(query)
 
 	# TO DO, get rid of array and for loop
 
@@ -228,12 +239,14 @@ def login(username, password):
 
 	try:
 		# now, we know the usertype, groupid
-		queryResult = session.execute(query)
+		queryResult = c_session.execute(query)
 
 		# TO DO: get rid of for loop
 		for rows in queryResult:
 			if(pbkdf2_sha256.verify(password, rows.password)):
 				
+				#session['username'] = rows.username 
+				#print('session' , session)
 				return{
 					'username' 	: rows.username,
 					'usertype' 	: rows.usertype,
@@ -247,12 +260,12 @@ def login(username, password):
 
 @app.route('/api/init', methods = ['GET'])
 def init():
-	global cluster, session
+	global cluster, c_session
 	cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
                       port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT', 9042)))
-	session = cluster.connect()
-	init_db(cluster, session)
-	session = cluster.connect('yte')
+	c_session = cluster.connect()
+	init_db(cluster, c_session)
+	c_session = cluster.connect('yte')
 	return "The database has been initiated!"
 	
 if __name__ == "__main__":

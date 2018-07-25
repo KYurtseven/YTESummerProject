@@ -74,8 +74,6 @@ const AddUser = (props) =>
                     name : props.scope.state.newUserName,
                     groupid : props.scope.state.userInfo.groupid
                 });
-                console.log('body: ' + body);
-                console.log('url: ' + url);
                 let res = await BasePage.CallApiPost(url, body);
                
                 if(res.status === 200)
