@@ -4,14 +4,16 @@ import * as BasePage from './BasePage';
 import './Home.css';
 import Cookies from "universal-cookie";
 
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 
 class Login extends React.Component {
     
@@ -22,10 +24,9 @@ class Login extends React.Component {
         {
             username : '',
             password : '',
-            isPressed : false,
-            renderHome: false,
+            isLoading : false,
+            isValid : false,
             userInfo : {},
-            toPage : ''
         }
         
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
@@ -51,14 +52,28 @@ class Login extends React.Component {
             
     }
 
+    verifyInput()
+    {
+        console.log('verify');
+        if(this.state.username.length > 0
+            && this.state.password.length > 0)
+        {
+            this.setState({isValid: true});
+        }
+        else
+            this.setState({isValid: false});
+    }
+
     handleUsernameChange(event)
     {
         this.setState({username: event.target.value});
-    }
+        this.verifyInput();
+    }   
 
     handlePasswordChange(event)
     {
         this.setState({password: event.target.value});
+        this.verifyInput();
     }
 
     setCookiesAndPushRoute(userInfo)
@@ -77,14 +92,18 @@ class Login extends React.Component {
         else
             return;
     }
+
     async handleSubmit(event)
     {
-        // TO DO
-        this.setState({isPressed: true});
+        if(this.state.isLoading)
+            return;
+
+        this.setState({isLoading: true});
         
         if(Constants.IS_MOCK)
         {
             let userInfo = Constants.MOCK_LOGIN_RESPONSE;
+            this.setState({isLoading: false});
             this.setCookiesAndPushRoute(userInfo);
         }
         else
@@ -101,7 +120,8 @@ class Login extends React.Component {
                 {
                     let restext = await res.text();
                     let resJSON = JSON.parse(restext);
-                    
+
+                    this.setState({isLoading: false});
                     this.setCookiesAndPushRoute(resJSON);
                 }
                 else
@@ -111,14 +131,9 @@ class Login extends React.Component {
             {
                 this.setState({error: e.toString()});
                 console.log('Error on fetching data: ' + e);
+                this.setState({isLoading: false});
             }
         }
-        this.setState({isPressed: false});
-    }
-
-    validateForm()
-    {
-        return this.state.username.length > 0 && this.state.password.length > 0;
     }
 
     render()
@@ -158,35 +173,48 @@ class Login extends React.Component {
                     </CardContent>
 
                     <CardActions style={{float: 'right'}}>
-                        <Button 
-                        onClick={this.handleSubmit}
-                        color="secondary" autoFocus>
-                            Submit
-                        </Button>
+                        <div className={classes.wrapper}>
+
+                            <Button 
+                            onClick={this.handleSubmit}
+                            color="secondary" 
+                            autoFocus
+                            disabled={!this.state.isValid || this.state.isLoading}
+                            >
+                                Submit
+                            </Button>
+                            
+                            {this.state.isLoading && 
+                                <CircularProgress 
+                                    size={24} 
+                                    className={classes.buttonProgress} 
+                                />
+                            }
+                        </div>
                     </CardActions>
                 </Card> 
             </div>
         );
     }
   }
-const styles = {
+const styles = theme => ({
     card: {
         minWidth: 500,
         alignSelf : 'flex-end'
     },
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
+    buttonProgress: {
+        color: 'secondary',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        marginTop: -12,
+        marginLeft: -12,
     },
-    title: {
-        marginBottom: 16,
-        fontSize: 14,
-    },
-    pos: {
-        marginBottom: 12,
-    },
-};
+    wrapper: {
+        margin: theme.spacing.unit,
+        position: 'relative',
+      },
+});
 
 
 Login.propTypes = {

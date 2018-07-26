@@ -9,10 +9,14 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import ButtonWithLoading from '../GlobalPages/ButtonWithLoading';
+
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 
 const UpdateDeposit = (props) =>
 {
-    
+
     function handleUpdateDepositHide()
     {
         props.scope.setState({isUpdateDepositShow: false});
@@ -23,13 +27,16 @@ const UpdateDeposit = (props) =>
         props.scope.setState({depositValue: event.target.value});
     }
 
-
-
     // post to the database
     async function handleDepositSubmit(event)
     {
         if(!isNaN(props.scope.state.depositValue))
         {
+            if(props.scope.state.isLoadingDeposit)
+                return;
+
+            props.scope.setState({isLoadingDeposit: true});
+            
             var url;
             url = Constants.getRoot() + Constants.updateDeposit;
 
@@ -43,6 +50,7 @@ const UpdateDeposit = (props) =>
                 let res = await BasePage.CallApiPost(url, body);
                 if(res.status === 200)
                 {
+                    props.scope.setState({isLoadingDeposit: false});
                     await props.fetchDataAgain();
                     // this page will be automatically re-rendered
                 }
@@ -54,7 +62,9 @@ const UpdateDeposit = (props) =>
             {
                 props.scope.setState({error: e});
                 console.log('Error on deposit submit' + props.scope.state.error);
+                props.scope.setState({isLoadingDeposit: false});
             }
+            
         }
         else
         {
@@ -88,13 +98,29 @@ const UpdateDeposit = (props) =>
                 <Button onClick={handleUpdateDepositHide} color="secondary">
                     Cancel
                 </Button>
-                <Button onClick={handleDepositSubmit} color="secondary" autoFocus>
-                    Submit
-                </Button>
+                
+                <ButtonWithLoading
+                    handleSubmit = {handleDepositSubmit}
+                    isLoading = {props.scope.state.isLoadingDeposit}
+                    // TO DO: fix circleIcon prop.
+                    circleIcon = {'83%'}
+                />
+
             </DialogActions>
         </Dialog>
     );
 
 }
 
-export default UpdateDeposit;
+const styles = theme => ({
+    wrapper: {
+        margin: theme.spacing.unit,
+        position: 'relative',
+      },
+});
+
+UpdateDeposit.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(UpdateDeposit);

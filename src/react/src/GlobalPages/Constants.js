@@ -1,6 +1,6 @@
 export const IS_MOCK = false;
 export const LOCAL_ROOT = 'http://127.0.0.1:5000/';
-export const TEST_ROOT = 'http://ec2-18-188-137-19.us-east-2.compute.amazonaws.com:5000/';
+export const TEST_ROOT = 'http://ec2-18-191-135-221.us-east-2.compute.amazonaws.com:5000/';
 export const PROD_ROOT = 'TODO';
 
 const DeploymentTypeCode = {

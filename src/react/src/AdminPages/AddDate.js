@@ -2,7 +2,6 @@ import React from 'react';
 import * as Constants from '../GlobalPages/Constants' ;
 import * as BasePage from '../GlobalPages/BasePage';
 
-
 import AddIcon from '@material-ui/icons/Add';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
@@ -12,11 +11,13 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
+import ButtonWithLoading from '../GlobalPages/ButtonWithLoading';
 
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 
 const AddDate = (props) =>
 {
-
     function handleAddDateDialogShow()
     {
         props.scope.setState({isAddDateDialogShow: true});
@@ -37,6 +38,11 @@ const AddDate = (props) =>
     {
         if(BasePage.isValidDate(props.scope.state.dateValue) === 'success')
         {
+            if(props.scope.state.isLoadingAddDate)
+                return;
+            
+            props.scope.setState({isLoadingAddDate: true});
+            
             var url;
             url = Constants.getRoot() + Constants.addDate;
 
@@ -50,6 +56,8 @@ const AddDate = (props) =>
                 let res = await BasePage.CallApiPost(url, body);
                 if(res.status === 200)
                 {
+                    props.scope.setState({isLoadingAddDate: false});
+
                     await props.fetchDataAgain();
                 }
                 else
@@ -59,7 +67,9 @@ const AddDate = (props) =>
             {
                 props.scope.setState({error: e});
                 console.log('Error on date submit: ' + props.scope.state.error);
+                props.scope.setState({isLoadingAddDate: false});
             }
+            
         }
         else
         {
@@ -103,13 +113,29 @@ const AddDate = (props) =>
                 <Button onClick={handleAddDateDialogHide} color="secondary">
                     Cancel
                 </Button>
-                <Button onClick={handleAddDateSubmit} color="secondary" autoFocus>
-                    Submit
-                </Button>
+                        
+                <ButtonWithLoading
+                    handleSubmit = {handleAddDateSubmit}
+                    isLoading = {props.scope.state.isLoadingAddDate}
+                    // TO DO: fix circleIcon prop.
+                    circleIcon = {'83%'}
+                />
             </DialogActions>
         </Dialog>
 
         </div>
     );
 }
-export default AddDate;
+
+const styles = theme => ({
+    wrapper: {
+        margin: theme.spacing.unit,
+        position: 'relative',
+      },
+});
+
+AddDate.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(AddDate);
