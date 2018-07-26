@@ -11,7 +11,7 @@ from flask_cors import CORS
 app = FlaskAPI(__name__)
 CORS(app)
 ## For connecting the database
-cluster, c_session = 0, 0
+global cluster, c_session
 
 # FOR NOW, DELETE WHEN DEPLOYMENT
 #cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
@@ -133,7 +133,7 @@ def addUser():
 	email = request.get_json(force=True).get('email')
 	password = request.get_json(force=True).get('password')
 	name = request.get_json(force=True).get('name')
-	usertype = 'user'
+	usertype = request.get_json(force=True).get('usertype')
 	
 	# first, check whether there is a user with that name
 	queryCheck = "SELECT username from YTE.EMPLOYEE where username = '" + username + "'"
@@ -149,9 +149,9 @@ def addUser():
 	hashpassword = pbkdf2_sha256.hash(password)
 
 	#add employee
-	queryAddEmployee = 	"INSERT INTO YTE.EMPLOYEE (username, password, usertype) " + \
+	queryAddEmployee = 	"INSERT INTO YTE.EMPLOYEE (username, password, usertype, groupid) " + \
 						" VALUES('" + username + "', '" + hashpassword + "'" + \
-						", '" + usertype + "')"
+						", '" + usertype + "', " + str(groupid) + ")"
 	
 	c_session.execute(queryAddEmployee)
 
@@ -260,15 +260,24 @@ def login(username, password):
 			'error' : str(e)
 		}
 
-@app.route('/api/init', methods = ['GET'])
-def init():
+@app.route('/api/createDatabase', methods = ['GET'])
+def createDatabase():
 	global cluster, c_session
 	cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
                       port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT', 9042)))
 	c_session = cluster.connect()
 	init_db(cluster, c_session)
 	c_session = cluster.connect('yte')
-	return "The database has been initiated!"
+	return "The database has been created!"
+
+@app.route('/api/init', methods = ['GET'])
+def init():
+	global cluster, c_session
+	cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR', 'localhost')],
+                      port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT', 9042)))
 	
+	c_session = cluster.connect('yte')
+	return "Initiated"
+
 if __name__ == "__main__":
 	app.run(host='0.0.0.0', port=5000, debug=True)
