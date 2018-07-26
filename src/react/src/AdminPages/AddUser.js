@@ -36,6 +36,10 @@ const AddUser = (props) =>
         props.scope.setState({newUserName: event.target.value});
     }
 
+    function handleUserTypeChange(event)
+    {
+        props.scope.setState({newUserUserType: event.target.value});
+    }
 
     function checkValidity()
     {
@@ -76,8 +80,10 @@ const AddUser = (props) =>
                     email : props.scope.state.newUserEmail,
                     password : props.scope.state.newUserPassword,
                     name : props.scope.state.newUserName,
+                    usertype : props.scope.state.newUserUserType,
                     groupid : props.scope.state.userInfo.groupid
                 });
+                console.log('body: ' + body);
                 let res = await BasePage.CallApiPost(url, body);
                
                 if(res.status === 200)
@@ -182,6 +188,22 @@ const AddUser = (props) =>
                         }}
                     />
                 </form>
+
+                <Divider light />
+
+                <form style={{display: 'flex',flexWrap: 'wrap',}} noValidate>
+                    <TextField
+                        id="usertype"
+                        label="usertype"
+                        type="text"
+                        onChange={handleUserTypeChange}
+                        style={{width: 200}}
+                        InputLabelProps={{
+                        shrink: true,
+                        }}
+                    />
+                </form>
+
 
             </DialogContent>
                 <DialogActions>

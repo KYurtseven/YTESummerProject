@@ -70,6 +70,11 @@ class Header extends React.Component
                 <Avatar alt="Tübitak logo" src={tubitak_logo} style={{margin:10,marginLeft: -10}} />
                 
                 <Typography variant="title" color="inherit"
+                    style={{flex : 1, fontSize:14 }}>
+                    LATE EMPLOYEE TRACKING SYSTEM
+                </Typography>
+
+                <Typography variant="title" color="inherit"
                     style={{flex : 1, }}>
                     {this.props.name ? this.props.name : 'TÜBİTAK'}
                 </Typography>
