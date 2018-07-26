@@ -13,6 +13,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
+import ButtonWithLoading from '../GlobalPages/ButtonWithLoading';
 
 const AddDateForMultiUser = (props) =>
 {
@@ -36,6 +37,11 @@ const AddDateForMultiUser = (props) =>
     {
         if(BasePage.isValidDate(props.scope.state.dateValueForMultiUser) === 'success')
         {
+            if(props.scope.state.isLoadingAddDateMultiUser)
+                return;
+                
+            props.scope.setState({isLoadingAddDateMultiUser: true});
+
             var url;
             url = Constants.getRoot() + Constants.addDateToMultiUser;
 
@@ -51,13 +57,13 @@ const AddDateForMultiUser = (props) =>
                 date : props.scope.state.dateValueForMultiUser
             });
 
-            
             try
             {
                 let res = await BasePage.CallApiPost(url, body);
                 if(res.status === 200)
                 {
                     hideAddShowMultiDateDialog();
+                    props.scope.setState({isLoadingAddDateMultiUser: false});
                     await props.fetchDataAgain();
                 }
                 else
@@ -67,6 +73,7 @@ const AddDateForMultiUser = (props) =>
             {
                 props.scope.setState({error: e});
                 console.log('Error on date for multiple user submit: ' + props.scope.state.error);
+                props.scope.setState({isLoadingAddDateMultiUser: false});
             }
             
         }
@@ -135,9 +142,14 @@ const AddDateForMultiUser = (props) =>
                     <Button onClick={hideAddShowMultiDateDialog} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleAddDateToMultipleUserSubmit} color="primary">
-                        OK
-                    </Button>
+                    
+                    <ButtonWithLoading
+                        handleSubmit = {handleAddDateToMultipleUserSubmit}
+                        isLoading = {props.scope.state.isLoadingAddDateMultiUser}
+                        // TO DO: fix circleIcon prop.
+                        circleIcon = {'94%'}
+                    />
+
                 </DialogActions>
             </Dialog>
         );

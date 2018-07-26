@@ -13,14 +13,17 @@ import SaveIcon from '@material-ui/icons/Save';
 import { withRouter } from 'react-router';
 import PropTypes from 'prop-types';
 import Header from './Header';
+import { withStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 class Profile extends React.Component
 {  
     static propTypes = {
         match: PropTypes.object.isRequired,
         location: PropTypes.object.isRequired,
         history: PropTypes.object.isRequired
-      }
-
+    }
+    
     constructor(props)
     {
         super(props);
@@ -28,7 +31,9 @@ class Profile extends React.Component
         {
             userInfo : {},
             newEmail : '',
-            newPassword: ''
+            newPassword: '',
+            isLoadingEmail : false,
+            isLoadingPassword : false,
         }
         
         this.handleChangeMailSubmit = this.handleChangeMailSubmit.bind(this);
@@ -54,6 +59,11 @@ class Profile extends React.Component
     {
         if(BasePage.validateEmail(this.state.newEmail) === 'success')
         {
+            if(this.state.isLoadingEmail)
+                return;
+
+            this.setState({isLoadingEmail: true});
+            
             var url;
             url = Constants.getRoot() + Constants.changeEmail;
 
@@ -67,6 +77,7 @@ class Profile extends React.Component
                 let res = await BasePage.CallApiPost(url, body);
                 if(res.status === 200)
                 {
+                    this.setState({isLoadingEmail: false});
                     this.props.history.goBack();
                 }
                 else
@@ -76,6 +87,7 @@ class Profile extends React.Component
             {
                 this.setState({error: e});
                 console.log('Error on change mail submit' + this.state.error);
+                this.setState({isLoadingEmail: false});
             }
         }
         else
@@ -86,6 +98,8 @@ class Profile extends React.Component
 
     renderEmail()
     {
+        const { classes } = this.props;
+
         return(
             <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -100,15 +114,26 @@ class Profile extends React.Component
                         onChange={this.handleChangeMailChange}
                         margin="normal"
                     />
-                    <Button 
-                        variant="contained" 
-                        size="small"  
-                        style={{float: 'right', marginRight: 40}}
-                        onClick = {this.handleChangeMailSubmit}
-                    >
-                        <SaveIcon style = {{fontSize: 12}} />
-                        Save
-                    </Button>
+
+                    <div className={classes.wrapper}>
+                        <Button 
+                            variant="contained" 
+                            size="small"  
+                            //style={{float: 'right', marginRight: 40}}
+                            disabled = {this.state.isLoadingEmail}
+                            onClick = {this.handleChangeMailSubmit}
+                        >
+                            <SaveIcon style = {{fontSize: 12}} />
+                            Save
+                        </Button>
+                        {this.state.isLoadingEmail && 
+                            <CircularProgress 
+                                size={24} 
+                                className={classes.buttonProgress} 
+                            />
+                        }
+
+                    </div>
                 </ExpansionPanelDetails>
             </ExpansionPanel>
 
@@ -122,6 +147,11 @@ class Profile extends React.Component
 
     async handlePasswordSubmit()
     {
+        if(this.state.isLoadingPassword)
+            return;
+
+        this.setState({isLoadingPassword: true});
+        
         var url;
         url = Constants.getRoot() + Constants.changePassword;
 
@@ -135,6 +165,7 @@ class Profile extends React.Component
             let res = await BasePage.CallApiPost(url, body);
             if(res.status === 200)
             {
+                this.setState({isLoadingPassword: false});
                 this.props.history.goBack();
             }
             else
@@ -144,11 +175,15 @@ class Profile extends React.Component
         {
             this.setState({error: e});
             console.log('Error on change password submit' + this.state.error);
+            this.setState({isLoadingPassword: false});
         }
+        
     }
 
     renderPassword()
     {
+        const { classes } = this.props;
+
         return(
             <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -164,15 +199,25 @@ class Profile extends React.Component
                         onChange={this.handlePasswordChange}
                         margin="normal"
                     />
-                    <Button 
-                        variant="contained" 
-                        size="small"  
-                        style={{float: 'right', marginRight: 40}}
-                        onClick = {this.handlePasswordSubmit}
-                    >
-                        <SaveIcon style = {{fontSize: 12}} />
-                        Save
-                    </Button>
+
+                    <div className={classes.wrapper}>
+                        <Button 
+                            variant="contained" 
+                            size="small"  
+                            disabled = {this.state.isLoadingPassword}
+                            onClick = {this.handlePasswordSubmit}
+                        >
+                            <SaveIcon style = {{fontSize: 12}} />
+                            Save
+                        </Button>
+                        {this.state.isLoadingPassword && 
+                            <CircularProgress 
+                                size={24} 
+                                className={classes.buttonProgress} 
+                            />
+                        }
+                    </div>
+
                 </ExpansionPanelDetails>
             </ExpansionPanel>
         );
@@ -189,11 +234,35 @@ class Profile extends React.Component
 
             {this.renderPassword()}
 
-            
-
         </div>
         );
     }
 }
 
-export default withRouter(Profile);
+const styles = theme => ({
+    card: {
+        minWidth: 500,
+        alignSelf : 'flex-end'
+    },
+    buttonProgress: {
+        color: 'secondary',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        marginTop: -12,
+        marginLeft: -12,
+    },
+    wrapper: {
+        margin: theme.spacing.unit,
+        position: 'relative',
+        float: 'right',
+        marginRight: 40
+      },
+});
+
+
+Profile.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withRouter(withStyles(styles)(Profile));

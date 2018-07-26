@@ -47,6 +47,12 @@ class UserItem extends Component
             dateValue : '',
             page : 0,
             rowsPerPage: 5,
+
+            isLoadingDeposit: false,
+            isLoadingAddDate: false,
+            isLoadingAddDateMultiUser: false,
+            isLoadingAddUser: false,
+            isLoadingDeleteDate: false
         };
 
         this.handleTabChange = this.handleTabChange.bind(this);

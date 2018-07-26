@@ -11,7 +11,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Divider from '@material-ui/core/Divider';
-
+import ButtonWithLoading from '../GlobalPages/ButtonWithLoading';
 
 const AddUser = (props) =>
 {   
@@ -57,11 +57,15 @@ const AddUser = (props) =>
         props.scope.setState({isShowUserDialog: false});
     }
     
-
     async function handleAddUserSubmit()
     {
         if(checkValidity())
         {
+            if(props.scope.state.isLoadingAddUser)
+                return;
+
+            props.scope.setState({isLoadingAddUser: true});
+
             try
             {
                 var url;
@@ -84,6 +88,7 @@ const AddUser = (props) =>
                         throw(resJSON.error);
 
                     hideDialog();
+                    props.scope.setState({isLoadingAddUser: false});
                     await props.fetchDataAgain();
                     //this page will be automatically re-rendered
                 }
@@ -94,7 +99,9 @@ const AddUser = (props) =>
             {
                 props.scope.setState({error: e});
                 console.log('Error on adduser submit' + props.scope.state.error);
+                props.scope.setState({isLoadingAddUser: false});
             }
+
         }
         else
         {
@@ -181,9 +188,15 @@ const AddUser = (props) =>
                     <Button onClick={hideDialog} color="secondary">
                         Cancel
                     </Button>
-                    <Button onClick={handleAddUserSubmit} color="secondary" autoFocus>
-                        Submit
-                    </Button>
+
+                    <ButtonWithLoading
+                        handleSubmit = {handleAddUserSubmit}
+                        isLoading = {props.scope.state.isLoadingAddUser}
+                        // TO DO: fix circleIcon prop.
+                        circleIcon = {'90%'}
+                    />
+
+
                 </DialogActions>
                 {props.scope.state.error}
             </Dialog>
